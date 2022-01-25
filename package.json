@@ -1,0 +1,28 @@
+{
+  "name": "@andreashauschild/node-red-contrib-ethers-node",
+  "version": "0.0.2",
+  "description": "Node-Red  noded for wrapping ethers functions.",
+  "main": "index.js",
+  "keywords": ["node-red"],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andreashauschild/node-red-contrib-ethers-node.git"
+  },
+  "author": "Andreas Hauschild",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/andreashauschild/node-red-contrib-ethers-node/issues"
+  },
+  "homepage": "https://github.com/andreashauschild/node-red-contrib-ethers-node#readme",
+  "node-red": {
+    "nodes": {
+      "transfer": "nodes/ethers-transfer.js"
+    }
+  },
+  "dependencies": {
+    "ethers": "^5.5.3"
+  }
+}
