@@ -2,7 +2,7 @@
 Node-Red Nodes for wrapping ethers functions.
 
 Transfer Node to send basic funds. 
-![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/docs/screenshot.PNG?raw=true)
+![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/screenshot.PNG?raw=true)
 
 # Developer notes.
 
