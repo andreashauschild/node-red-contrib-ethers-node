@@ -1,27 +1,19 @@
-const ethers = require('ethers');
+const {EthersActionExecutor} = require("../dist/src/EthersActionExecutor");
+const {TransferAction} = require("../dist/src/EthersActionExecutor");
+
 module.exports = function (RED) {
     function EthersTransferNode(config) {
         RED.nodes.createNode(this, config);
         this.mnemonic = this.credentials.mnemonic;
         this.chainId = config.chainId;
         this.rpc = config.rpc;
-
         var node = this;
+        var ethersActionExecutor = new EthersActionExecutor(this.mnemonic, this.chainId, this.rpc, node);
         node.on('input', function (msg) {
             this.hierarchicalDeterministicWalletIndex = msg[config.hierarchicalDeterministicWalletIndex];
             this.toAddress = msg[config.toAddress];
             this.amount = msg[config.amount];
-            const path = `m/44'/60'/0'/0/${this.hierarchicalDeterministicWalletIndex}`
-            let provider = new ethers.providers.JsonRpcProvider(this.rpc);
-            const wallet = ethers.Wallet.fromMnemonic(this.mnemonic,path).connect(provider);
-            wallet.sendTransaction({
-                to: this.toAddress,
-                from: wallet.address,
-                value: ethers.utils.parseEther(this.amount)
-            }).then(tx => {
-                provider.waitForTransaction(tx.hash).then(txReceipt => node.send({...msg, txReceipt}));
-            });
-
+            ethersActionExecutor.execute(new TransferAction(this.hierarchicalDeterministicWalletIndex, this.toAddress, this.amount));
         });
     }
 

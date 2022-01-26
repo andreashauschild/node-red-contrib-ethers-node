@@ -10,3 +10,8 @@ Transfer Node to send basic funds.
 
 `cd C:\Users\hausc\.node-red`
 `npm install C:\Work\Entwicklung\Git\node-red-contrib-ethers-node`
+
+# Install 
+`npm install -g ts-node` to execute local scripts `ts-node .\src\test.ts`
+`node-red-contrib-ethers-node> tsc -w`
+ Typescript imports have to be like `import * as ethers from "ethers";` if you get undefined - https://github.com/TypeStrong/ts-node/issues/311

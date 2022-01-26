@@ -81,3 +81,8 @@ testem.log
 
 # System Files
 Thumbs.db
+
+
+#Custom
+private-test-env.ts
+*.tgz
