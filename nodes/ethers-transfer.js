@@ -8,14 +8,15 @@ module.exports = function (RED) {
 
         var node = this;
         node.on('input', function (msg) {
-            this.fromAddress = msg[config.fromAddress];
+            this.hierarchicalDeterministicWalletIndex = msg[config.hierarchicalDeterministicWalletIndex];
             this.toAddress = msg[config.toAddress];
             this.amount = msg[config.amount];
+            const path = `m/44'/60'/0'/0/${this.hierarchicalDeterministicWalletIndex}`
             let provider = new ethers.providers.JsonRpcProvider(this.rpc);
-            const wallet = ethers.Wallet.fromMnemonic(this.mnemonic).connect(provider);
+            const wallet = ethers.Wallet.fromMnemonic(this.mnemonic,path).connect(provider);
             wallet.sendTransaction({
                 to: this.toAddress,
-                from: this.fromAddress,
+                from: wallet.address,
                 value: ethers.utils.parseEther(this.amount)
             }).then(tx => {
                 provider.waitForTransaction(tx.hash).then(txReceipt => node.send({...msg, txReceipt}));
