@@ -31,8 +31,6 @@ jobs:
           scope: '@andreashauschild'
       - name: Install dependencies
         run: npm ci
-      - run: git config --global user.name "${{secrets.GIT_USER}}"
-      - run: git config --global user.email "${{secrets.GIT_EMAIL}}"
       - run: npm version ${{ env.NPM_VERSION_TO_PUBLISH }}
         working-directory: .
       - run: npm run lib:build --if-present
