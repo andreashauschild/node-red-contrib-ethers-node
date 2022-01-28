@@ -27,7 +27,7 @@ jobs:
           node-version: '14.x'
           registry-url: https://registry.npmjs.org
           scope: '@andreashauschild'
-      - run: npm --no-git-tag-version version ${{ env.NPM_VERSION_TO_PUBLISH }}
+      - run: npm --no-git-tag-version version ${{ env.NPM_VERSION_TO_PUBLISH }} # The flag --no-git-tag-version is very important here because GitHub already created the tag
       - name: Install dependencies
         run: npm ci
       - run: npm run build --if-present
