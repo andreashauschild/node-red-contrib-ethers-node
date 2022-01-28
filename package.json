@@ -7,10 +7,20 @@
     "node-red"
   ],
   "files": [
-    "/nodes","dist/src"
+    "/nodes",
+    "dist/src"
   ],
+  "watch": {
+    "watch.dev": {
+      "patterns": ["nodes", "src"],
+      "extensions": "js,ts,html",
+      "delay": 500
+    }
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch.dev": "tsc && kill-port 1880 && node-red",
+    "watch": "npm-watch",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -31,5 +41,9 @@
     "eslint": "^8.7.0",
     "ethers": "^5.5.3",
     "rxjs": "^7.5.2"
+  },
+  "devDependencies": {
+    "kill-port": "^1.6.1",
+    "npm-watch": "^0.11.0"
   }
 }
