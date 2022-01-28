@@ -28,7 +28,7 @@ jobs:
           registry-url: https://registry.npmjs.org
           scope: '@andreashauschild'
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       - run: npm version ${{ env.NPM_VERSION_TO_PUBLISH }}
       - run: npm run lib:build --if-present
       - run: npm publish --access public
