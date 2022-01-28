@@ -1,9 +1,12 @@
 import {EthersActionExecutor, TransferAction} from "../src/EthersActionExecutor";
-import {ENV_MNEMONIC, ENV_RPC} from "./private-test-env";
+// import {ENV_MNEMONIC, ENV_RPC} from "./private-test-env";
 
 // Info you need to configure your own private-test-env.ts file with this variables, because it will not be checked in
-const mnemonic = ENV_MNEMONIC
-const rpc = ENV_RPC
+// const mnemonic = ENV_MNEMONIC
+// const rpc = ENV_RPC
+
+const mnemonic = "ENV_MNEMONIC"
+const rpc = "ENV_RPC"
 const chainId = 80001;
 
 
