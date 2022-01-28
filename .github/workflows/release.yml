@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: .
     steps:
       - run: git config --global user.name "${{secrets.GIT_USER}}"
       - run: git config --global user.email "${{secrets.GIT_EMAIL}}"
@@ -34,9 +33,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - run: npm version ${{ env.NPM_VERSION_TO_PUBLISH }}
-        working-directory: .
       - run: npm run lib:build --if-present
       - run: npm publish --access public
-        working-directory: .
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_PUBLISH_TOKEN}}
