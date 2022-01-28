@@ -13,6 +13,8 @@ jobs:
       run:
         working-directory: .
     steps:
+      - run: git config --global user.name "${{secrets.GIT_USER}}"
+      - run: git config --global user.email "${{secrets.GIT_EMAIL}}"
       - name: Variables
         id: variables
         uses: actions/github-script@v5
