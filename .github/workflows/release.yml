@@ -27,6 +27,7 @@ jobs:
           node-version: '14.x'
           registry-url: https://registry.npmjs.org
           scope: '@andreashauschild'
+      - run: npm version ${{ env.NPM_VERSION_TO_PUBLISH }}
       - name: Install dependencies
         run: npm ci
       - run: npm run build --if-present
