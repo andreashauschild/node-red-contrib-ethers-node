@@ -37,7 +37,8 @@
   "homepage": "https://github.com/andreashauschild/node-red-contrib-ethers-node#readme",
   "node-red": {
     "nodes": {
-      "transfer": "nodes/ethers-transfer.js"
+      "transfer": "nodes/ethers-transfer.js",
+      "ethers-credentials": "nodes/ethers-credentials.js"
     }
   },
   "dependencies": {

@@ -5,7 +5,15 @@ First stable version will be 1.0.0
 
 **Transfer Node to send basic funds.**
 
-![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/screenshot.PNG?raw=true)
+| Mnemonic Based Config | Mnemonic Based Transfer Node |
+|-----------------------|------------------------------|
+|![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/config-node-mnemonic.PNG?raw=true)|![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/transfer-mnemonic.PNG?raw=true)|
+
+
+| Private Key Based Config                                                                                                  | Private Key Based Transfer Node                                                                                           |
+|---------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| ![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/config-node-pkey.PNG?raw=true) | ![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/transfer-pkey.PNG?raw=true) |
+
 
 # Developer notes.
 This project is in early development
@@ -43,3 +51,10 @@ To start developing run: `npm run watch`. This will:
 
 ## Publish to npm
 Triggred via github actions and repositroy release.
+
+# Node Red Infos:
+- https://nodered.org/docs/api/
+- https://nodered.org/docs/api/ui/typedInput/
+- https://nodered.org/docs/creating-nodes/edit-dialog
+- https://nodered.org/docs/creating-nodes/appearance
+- https://nodered.org/docs/creating-nodes/status  (render status information below node)
