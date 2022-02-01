@@ -1,0 +1,79 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ethers-deploy', {
+        category: 'function',
+        color: '#fffd00',
+        defaults: {
+            ethCredentials: {
+                type: "ethers-credentials", required: true
+            },
+            hierarchicalDeterministicWalletIndex: {value: 0},
+            hierarchicalDeterministicWalletIndexType: {value: 'num'},
+            bytecode: {value: "", required: true},
+            bytecodeType: {value: 'str'},
+            abi: {value: "", required: true},
+            abiType: {value: 'json'},
+            params: {value: "[]", required: false},
+            paramsType: {value: 'json'},
+
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file.png",
+        label: function () {
+            return this.name || "ethers-deploy";
+        },
+        oneditprepare: function () {
+            $("#node-input-bytecode").typedInput({
+                default: 'str',
+                types: ["str", "msg", "flow", "global"],
+                typeField: $("#node-input-bytecode")
+            })
+            $("#node-input-hierarchicalDeterministicWalletIndex").typedInput({
+                default: 'num',
+                types: ["num", "msg", "flow", "global"],
+                typeField: $("#node-input-hierarchicalDeterministicWalletIndexType")
+            })
+            $("#node-input-abi").typedInput({
+                default: 'json',
+                types: ["json","msg", "flow", "global"],
+                typeField: $("#node-input-abiType")
+            })
+            $("#node-input-params").typedInput({
+                default: 'json',
+                types: ["json","msg", "flow", "global"],
+                typeField: $("#node-input-paramsType")
+            })
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="ethers-deploy">
+    <div class="form-row">
+        <label for="node-input-ethCredentials">Credentials</label>
+        <input type="text" id="node-input-ethCredentials">
+    </div>
+    <div class="form-row">
+        <label for="node-input-bytecode">Bytecode</label>
+        <input type="text" id="node-input-bytecode">
+        <input type="hidden" id="node-input-bytecodeType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-abi">ABI</label>
+        <input type="text" id="node-input-abi">
+        <input type="hidden" id="node-input-abiType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-params">Constructor Params (in array[])</label>
+        <input type="text" id="node-input-params">
+        <input type="hidden" id="node-input-paramsType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-hierarchicalDeterministicWalletIndex">Hierarchical Deterministic Wallet Index</label>
+        <input type="text" id="node-input-hierarchicalDeterministicWalletIndex">
+        <input type="hidden" id="node-input-hierarchicalDeterministicWalletIndexType">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="ethers-deploy">
+    <p>Node to deploy smart contract</p>
+</script>

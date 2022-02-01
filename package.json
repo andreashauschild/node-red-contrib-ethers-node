@@ -1,6 +1,6 @@
 {
   "name": "@andreashauschild/node-red-contrib-ethers-node",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Node-Red  noded for wrapping ethers functions.",
   "main": "index.js",
   "keywords": [
@@ -38,7 +38,8 @@
   "node-red": {
     "nodes": {
       "transfer": "nodes/ethers-transfer.js",
-      "ethers-credentials": "nodes/ethers-credentials.js"
+      "ethers-credentials": "nodes/ethers-credentials.js",
+      "ethers-deploy": "nodes/ethers-deploy.js"
     }
   },
   "dependencies": {

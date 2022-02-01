@@ -10,7 +10,7 @@ contract EnieToken is ERC20, ERC20Burnable, Pausable, AccessControl {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    constructor() ERC20("Enie Token", "ENIE") {
+    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _mint(msg.sender, 1000000000 * 10 ** decimals());

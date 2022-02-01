@@ -31,19 +31,26 @@ export enum CredentialType {
 }
 
 export enum ActionType {
-    TRANSFER = "TRANSFER"
+    TRANSFER = "TRANSFER",
+    DEPLOY_CONTRACT = "DEPLOY_CONTRACT",
 }
 
 
 export interface BaseAction {
     type: ActionType
     hierarchicalDeterministicWalletIndex?: number,
-    msg?: any
+    msg?: any,
 }
 
 export interface TransferAction extends BaseAction {
     amount: string,
     to: string
+}
+
+export interface DeployContractAction extends BaseAction {
+    abi: any,
+    constructorParameter?: any,
+    bytecode: string,
 }
 
 
@@ -59,25 +66,24 @@ export class EthersActionExecutor {
     }
 
     execute(action: BaseAction) {
-        if (this.credentials.type === CredentialType.MNEMONIC && action.hierarchicalDeterministicWalletIndex==null) {
+        if (this.credentials.type === CredentialType.MNEMONIC && action.hierarchicalDeterministicWalletIndex == null) {
             this.node.error(`Node use credentials of type '${CredentialType.MNEMONIC}', but the action does not provide a 'hierarchicalDeterministicWalletIndex'. Action will not be executed!`)
             return;
         }
 
         switch (this.credentials.type) {
             case CredentialType.MNEMONIC : {
-                if (action.hierarchicalDeterministicWalletIndex!=null && action.hierarchicalDeterministicWalletIndex>=0) {
+                if (action.hierarchicalDeterministicWalletIndex != null && action.hierarchicalDeterministicWalletIndex >= 0) {
                     if (!this.wallets[action.hierarchicalDeterministicWalletIndex]) {
                         const path = `m/44'/60'/0'/0/${action.hierarchicalDeterministicWalletIndex}`
                         const wallet = ethers.Wallet.fromMnemonic((this.credentials as MnemonicCredentials).mnemonic, path).connect(this.provider);
                         this.wallets[action.hierarchicalDeterministicWalletIndex] = wallet;
                         this.subjects[action.hierarchicalDeterministicWalletIndex] = new Subject<BaseAction>();
                         this.subscribeTransferHandler(this.subjects[action.hierarchicalDeterministicWalletIndex]);
+                        this.subscribeDeployContractHandler(this.subjects[action.hierarchicalDeterministicWalletIndex])
                     }
-                    switch (action.type) {
-                        case ActionType.TRANSFER:
-                            this.subjects[action.hierarchicalDeterministicWalletIndex].next(action);
-                    }
+                    this.subjects[action.hierarchicalDeterministicWalletIndex].next(action);
+
                 } else {
                     this.node.error(`Failed to execute action of type '${action.type}'. No 'hierarchicalDeterministicWalletIndex' was set!`)
                 }
@@ -89,15 +95,43 @@ export class EthersActionExecutor {
                     this.wallets[0] = wallet;
                     this.subjects[0] = new Subject<BaseAction>();
                     this.subscribeTransferHandler(this.subjects[0]);
+                    this.subscribeDeployContractHandler(this.subjects[0]);
                 }
-                switch (action.type) {
-                    case ActionType.TRANSFER:
-                        this.subjects[0].next(action);
-                }
+                this.subjects[0].next(action);
+
             }
         }
 
 
+    }
+
+    private subscribeDeployContractHandler(subject: Subject<BaseAction>) {
+        subject.pipe(filter(a => a != null && a.type === ActionType.DEPLOY_CONTRACT),
+            concatMap(async a => {
+                let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
+                const action = a as unknown as DeployContractAction;
+                const wallet = this.wallets[walletIndex];
+
+                const factory = new ethers.ContractFactory(action.abi, action.bytecode, wallet);
+
+                this.node.status({fill:"yellow",shape:"ring",text:"deploying"});
+
+                const contract = await factory.deploy(...action.constructorParameter);
+                const tx = contract.deployTransaction
+                this.node.log(`Deploy contract to '${contract.address}' with hash: '${tx.hash}', gasLimit '${tx.gasLimit.toString()}', gasPrice:'${tx.gasLimit.toString()}'`)
+
+                return contract.deployTransaction.wait().then(txReceipt => {
+                    this.node.status({fill:"green",shape:"ring",text:`deployed ${contract.address}`});
+                    return {txReceipt, action,contract}
+                }).catch(e => {
+                    this.node.error(e, action.msg)
+                    this.node.status({fill:"red",shape:"ring", text:`failed`});
+                });
+            })
+        ).subscribe(async result => {
+            this.node.log(`Deployed contract to '${result?.contract.address}'`)
+            this.node.send({...result?.action.msg, txReceipt: result?.txReceipt})
+        });
     }
 
     private subscribeTransferHandler(subject: Subject<BaseAction>) {
@@ -106,7 +140,10 @@ export class EthersActionExecutor {
                 let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
                 const action = a as unknown as TransferAction;
                 const wallet = this.wallets[walletIndex];
-                this.node.log(`Transfer '${action.amount}' from: '${wallet.address}' to '${action.to}'`)
+
+                const log = `Transfer '${action.amount}' from: '${wallet.address}' to '${action.to}'`
+                this.node.log(log)
+                this.node.status({fill:"yellow",shape:"ring",text:log});
                 const tx = await wallet.sendTransaction({
                     to: action.to,
                     from: wallet.address,
@@ -114,11 +151,16 @@ export class EthersActionExecutor {
                 })
                 return this.provider.waitForTransaction(tx.hash).then(txReceipt => {
                     return {txReceipt, action}
-                }).catch(e => this.node.error(e, action.msg));
+                }).catch(e => {
+                    this.node.error(e, action.msg)
+                    this.node.status({fill:"red",shape:"ring", text:`failed`});
+                });
             })
         ).subscribe(async result => {
-            this.node.log(`Transferred '${result.action.amount}' from: '${result.txReceipt.from}' to '${result.txReceipt.to}'`)
-            this.node.send({...result.action.msg, txReceipt: result.txReceipt})
+            const log = `Transferred '${result?.action?.amount}' from: '${result?.txReceipt?.from}' to '${result?.txReceipt?.to}'`;
+            this.node.log(log)
+            this.node.status({fill:"green",shape:"ring",text:log});
+            this.node.send({...result?.action.msg, txReceipt: result?.txReceipt})
         });
     }
 
@@ -127,6 +169,16 @@ export class EthersActionExecutor {
             type: ActionType.TRANSFER,
             amount,
             to,
+            hierarchicalDeterministicWalletIndex
+        }
+    }
+
+    public static deployContractAction(abi: any, bytecode: any, constructorParameter?: any, hierarchicalDeterministicWalletIndex?: number): DeployContractAction {
+        return {
+            type: ActionType.DEPLOY_CONTRACT,
+            abi,
+            bytecode,
+            constructorParameter,
             hierarchicalDeterministicWalletIndex
         }
     }
