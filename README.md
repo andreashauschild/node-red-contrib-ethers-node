@@ -14,10 +14,16 @@ First stable version will be 1.0.0
 |---------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | ![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/config-node-pkey.PNG?raw=true) | ![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/transfer-pkey.PNG?raw=true) |
 
+**Smart Contract Config Node**
+
+![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/contract-config.PNG?raw=true)
+
 **Generic Smart Contract Deployment Node**
 
 ![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/deploy-node.PNG?raw=true)
 
+**Generic  Contract Write Node**
+![system schema](https://github.com/andreashauschild/node-red-contrib-ethers-node/blob/main/docs/write-node.PNG?raw=true)
 
 # Developer notes.
 This project is in early development

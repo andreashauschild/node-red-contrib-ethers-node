@@ -5,7 +5,7 @@ const {
     CredentialType
 } = require("../dist/src/EthersActionExecutor");
 module.exports = function (RED) {
-    function EthersDeployNode(config) {
+    function EthersWriteNode(config) {
         RED.nodes.createNode(this, config);
         var node = this;
         this.contract = RED.nodes.getNode(config.contract);
@@ -24,18 +24,19 @@ module.exports = function (RED) {
             const params = RED.util.evaluateNodeProperty(config.params, config.paramsType || "json", node, msg)
             const abi = this.contract.abi;
             const bytecode = this.contract.bytecode;
+            const contractAddress = config.contractAddress
+            const method = config.method
             const hierarchicalDeterministicWalletIndex = RED.util.evaluateNodeProperty(config.hierarchicalDeterministicWalletIndex, config.hierarchicalDeterministicWalletIndexType || "num", node, msg)
 
 
             if (cred.type === CredentialType.MNEMONIC) {
-                const action = EthersActionExecutor.deployContractAction(abi, bytecode, params, hierarchicalDeterministicWalletIndex);
-                action.callback = (result) => console.log(result)
+                const action = EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, params, hierarchicalDeterministicWalletIndex);
                 ethersActionExecutor.execute(action);
             } else if (cred.type === CredentialType.PRIVATE_KEY) {
-                ethersActionExecutor.execute(EthersActionExecutor.deployContractAction(abi, bytecode, params));
+                ethersActionExecutor.execute(EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, params));
             }
         });
     }
 
-    RED.nodes.registerType("ethers-deploy", EthersDeployNode);
+    RED.nodes.registerType("ethers-write", EthersWriteNode);
 }

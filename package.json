@@ -39,7 +39,9 @@
     "nodes": {
       "transfer": "nodes/ethers-transfer.js",
       "ethers-credentials": "nodes/ethers-credentials.js",
-      "ethers-deploy": "nodes/ethers-deploy.js"
+      "ethers-deploy": "nodes/ethers-deploy.js",
+      "ethers-contract": "nodes/ethers-contract.js",
+      "ethers-write": "nodes/ethers-write.js"
     }
   },
   "dependencies": {

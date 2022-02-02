@@ -3,15 +3,15 @@
         category: 'function',
         color: '#fffd00',
         defaults: {
+            name: {value: ""},
+            contract: {
+                type: "ethers-contract", required: true
+            },
             ethCredentials: {
                 type: "ethers-credentials", required: true
             },
             hierarchicalDeterministicWalletIndex: {value: 0},
             hierarchicalDeterministicWalletIndexType: {value: 'num'},
-            bytecode: {value: "", required: true},
-            bytecodeType: {value: 'str'},
-            abi: {value: "", required: true},
-            abiType: {value: 'json'},
             params: {value: "[]", required: false},
             paramsType: {value: 'json'},
 
@@ -23,20 +23,10 @@
             return this.name || "ethers-deploy";
         },
         oneditprepare: function () {
-            $("#node-input-bytecode").typedInput({
-                default: 'str',
-                types: ["str", "msg", "flow", "global"],
-                typeField: $("#node-input-bytecode")
-            })
             $("#node-input-hierarchicalDeterministicWalletIndex").typedInput({
                 default: 'num',
                 types: ["num", "msg", "flow", "global"],
                 typeField: $("#node-input-hierarchicalDeterministicWalletIndexType")
-            })
-            $("#node-input-abi").typedInput({
-                default: 'json',
-                types: ["json","msg", "flow", "global"],
-                typeField: $("#node-input-abiType")
             })
             $("#node-input-params").typedInput({
                 default: 'json',
@@ -49,18 +39,16 @@
 
 <script type="text/html" data-template-name="ethers-deploy">
     <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+    <div class="form-row">
         <label for="node-input-ethCredentials">Credentials</label>
         <input type="text" id="node-input-ethCredentials">
     </div>
     <div class="form-row">
-        <label for="node-input-bytecode">Bytecode</label>
-        <input type="text" id="node-input-bytecode">
-        <input type="hidden" id="node-input-bytecodeType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-abi">ABI</label>
-        <input type="text" id="node-input-abi">
-        <input type="hidden" id="node-input-abiType">
+        <label for="node-input-contract">Contract</label>
+        <input type="text" id="node-input-contract">
     </div>
     <div class="form-row">
         <label for="node-input-params">Constructor Params (in array[])</label>

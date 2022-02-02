@@ -29,6 +29,10 @@ contract EnieToken is ERC20, ERC20Burnable, Pausable, AccessControl {
         _mint(to, amount);
     }
 
+    function mint(address to,address to2, uint256 amount) public onlyRole(MINTER_ROLE) {
+        _mint(to, amount);
+    }
+
     function _beforeTokenTransfer(address from, address to, uint256 amount)
     internal
     whenNotPaused

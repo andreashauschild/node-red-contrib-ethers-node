@@ -1,0 +1,52 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ethers-contract', {
+        category: 'config',
+        color: '#5aff08',
+        defaults: {
+            name: {value: "", required: true},
+            bytecode: {value: "", required: true},
+            bytecodeType: {value: 'str'},
+            abi: {value: "", required: true},
+            abiType: {value: 'json'},
+        },
+        inputs: 0,
+        outputs: 1,
+        icon: "file.png",
+        label: function () {
+            return `${this.name}` || "ethers-contract";
+        },
+        oneditprepare: function () {
+            $("#node-config-input-abi").typedInput({
+                default: 'json',
+                types: ["json"],
+                typeField: $("#node-config-input-abiType")
+            }),
+            $("#node-config-input").typedInput({
+                default: 'str',
+                types: ["str"],
+                typeField: $("#node-config-input")
+            })
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="ethers-contract">
+    <div class="form-row">
+        <label for="node-config-input-name">Name</label>
+        <input type="text" id="node-config-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-bytecode">Bytecode</label>
+        <input type="text" id="node-config-input-bytecode">
+        <input type="hidden" id="node-config-input-bytecodeType">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-abi">ABI</label>
+        <input type="text" id="node-config-input-abi">
+        <input type="hidden" id="node-config-input-abiType">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="ethers-contract">
+    <p>Config node that stores smart contract</p>
+</script>
