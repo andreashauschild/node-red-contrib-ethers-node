@@ -39,9 +39,11 @@
     "nodes": {
       "transfer": "nodes/ethers-transfer.js",
       "ethers-credentials": "nodes/ethers-credentials.js",
+      "ethers-rpc": "nodes/ethers-rpc.js",
       "ethers-deploy": "nodes/ethers-deploy.js",
       "ethers-contract": "nodes/ethers-contract.js",
-      "ethers-write": "nodes/ethers-write.js"
+      "ethers-write": "nodes/ethers-write.js",
+      "ethers-read": "nodes/ethers-read.js"
     }
   },
   "dependencies": {

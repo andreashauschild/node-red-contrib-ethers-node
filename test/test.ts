@@ -32,8 +32,8 @@ const nodeSilent = {
     send: (msg: any) => console.log(),
     log: (msg: any) => console.log(msg),
 }
-const mnemonicCredentials = createMnemonicCredential(mnemonic, chainId, rpc);
-let ethersActionExecutor = new EthersActionExecutor(mnemonicCredentials, nodeSilent);
+const mnemonicCredentials = createMnemonicCredential(mnemonic, chainId);
+let ethersActionExecutor = new EthersActionExecutor(mnemonicCredentials, rpc, nodeSilent);
 
 for (var i = 0; i < 10; i++) {
     ethersActionExecutor.execute(EthersActionExecutor.transferAction("0.01", "0xB3474e5f6186bFf89604bbf44630b2b49A8272aB", i));

@@ -1,53 +1,58 @@
 <script type="text/javascript">
-    RED.nodes.registerType('ethers-write', {
+    RED.nodes.registerType('ethers-read', {
         category: 'function',
-        color: '#d100ff',
+        color: '#00ffd8',
         defaults: {
             name: {value: ""},
             contract: {
                 type: "ethers-contract", required: true
             },
-            ethCredentials: {
-                type: "ethers-credentials", required: true
+            rpc: {
+                type: "ethers-rpc", required: true
             },
-
             method: {value: "", required: true},
             contractAddress: {value: "", required: true},
+            contractAddressType: {value: "str", required: true},
             params: {value: "[]", required: false},
             paramsType: {value: 'json'},
-            hierarchicalDeterministicWalletIndex: {value: 0},
-            hierarchicalDeterministicWalletIndexType: {value: 'num'},
+            output: {value: "payload", required: false},
+            outputType: {value: 'msg'},
 
         },
         inputs: 1,
         outputs: 1,
         icon: "file.png",
         label: function () {
-            return this.name || "ethers-write";
+            return this.name || "ethers-read";
         },
         oneditprepare: function () {
-            $("#node-input-hierarchicalDeterministicWalletIndex").typedInput({
-                default: 'num',
-                types: ["num", "msg", "flow", "global"],
-                typeField: $("#node-input-hierarchicalDeterministicWalletIndexType")
-            })
             $("#node-input-params").typedInput({
                 default: 'json',
                 types: ["json","msg", "flow", "global"],
                 typeField: $("#node-input-paramsType")
             })
+            $("#node-input-contractAddress").typedInput({
+                default: 'str',
+                types: ["str","msg", "flow", "global"],
+                typeField: $("#node-input-contractAddressType")
+            })
+            $("#node-input-output").typedInput({
+                default: 'msg',
+                types: ["msg", "flow", "global"],
+                typeField: $("#node-input-outputType")
+            })
         }
     });
 </script>
 
-<script type="text/html" data-template-name="ethers-write">
+<script type="text/html" data-template-name="ethers-read">
     <div class="form-row">
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name">
     </div>
     <div class="form-row">
-        <label for="node-input-ethCredentials">Credentials</label>
-        <input type="text" id="node-input-ethCredentials">
+        <label for="node-input-rpc">RPC</label>
+        <input type="text" id="node-input-rpc">
     </div>
     <div class="form-row">
         <label for="node-input-contract">Contract</label>
@@ -56,6 +61,7 @@
     <div class="form-row">
         <label for="node-input-contractAddress">Contract Address</label>
         <input type="text" id="node-input-contractAddress">
+        <input type="hidden" id="node-input-contractAddressType">
     </div>
     <div class="form-row">
         <label for="node-input-method">Method</label>
@@ -67,12 +73,12 @@
         <input type="hidden" id="node-input-paramsType">
     </div>
     <div class="form-row">
-        <label for="node-input-hierarchicalDeterministicWalletIndex">Hierarchical Deterministic Wallet Index</label>
-        <input type="text" id="node-input-hierarchicalDeterministicWalletIndex">
-        <input type="hidden" id="node-input-hierarchicalDeterministicWalletIndexType">
+        <label for="node-input-output">Output</label>
+        <input type="text" id="node-input-output">
+        <input type="hidden" id="node-input-outputType">
     </div>
 </script>
 
-<script type="text/html" data-help-name="ethers-write">
-    <p>Node to deploy smart contract</p>
+<script type="text/html" data-help-name="ethers-read">
+    <p>Node to read data from smart contract</p>
 </script>

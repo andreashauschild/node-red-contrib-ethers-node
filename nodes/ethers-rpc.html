@@ -1,0 +1,31 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ethers-rpc', {
+        category: 'config',
+        color: '#5aff08',
+        defaults: {
+            name: {value: "", required: true},
+            rpc: {value: "", required: true},
+        },
+        inputs: 0,
+        outputs: 1,
+        icon: "file.png",
+        label: function () {
+            return `${this.name}` || "ethers-rpc";
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="ethers-rpc">
+    <div class="form-row">
+        <label for="node-config-input-name">Name</label>
+        <input type="text" id="node-config-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-rpc">RPC</label>
+        <input type="text" id="node-config-input-rpc">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="ethers-rpc">
+    <p>Node that stores rpc config</p>
+</script>
