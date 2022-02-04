@@ -1,6 +1,7 @@
 import {expect} from "chai";
 import {ethers} from "hardhat";
 import {BigNumber} from "ethers";
+import {EnieToken} from "../typechain";
 
 const _abi = [
     {
@@ -652,14 +653,27 @@ const _bytecode =
 
 describe("Greeter", function () {
     it("Should return the new greeting once it's changed", async function () {
-        const [owner] = await ethers.getSigners();
+        const [owner,user] = await ethers.getSigners();
         const factory = new ethers.ContractFactory(_abi, _bytecode, owner);
 
         const contract = await factory.deploy(...['Enie', 'ENIE']);
         let method = 'mint( address, uint256)'
         method = method.replace(/\s/g, '');
 
-        console.log(await contract[method](...[owner.address, 10]));
+        const tx = await (contract as unknown as EnieToken).transfer(user.address,'1');
+        await tx.wait();
+
+        await contract[method](...[owner.address, 10]);
+        let typedEventFilter = (contract as unknown as EnieToken).filters.Transfer();
+
+        // contract.filters['Transfer(address,address,uint256)']
+
+        const events  =await contract.queryFilter(typedEventFilter,contract.deployTransaction.blockNumber);
+
+        console.log("-------------------------------------------------")
+        console.log(events)
+        events[1].eventSignature
+        console.log("-------------------------------------------------")
 
     });
 });

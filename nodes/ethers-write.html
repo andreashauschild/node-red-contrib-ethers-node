@@ -17,6 +17,8 @@
             paramsType: {value: 'json'},
             hierarchicalDeterministicWalletIndex: {value: 0},
             hierarchicalDeterministicWalletIndexType: {value: 'num'},
+            output: {value: "payload", required: false},
+            outputType: {value: 'msg'},
 
         },
         inputs: 1,
@@ -35,6 +37,11 @@
                 default: 'json',
                 types: ["json","msg", "flow", "global"],
                 typeField: $("#node-input-paramsType")
+            })
+            $("#node-input-output").typedInput({
+                default: 'msg',
+                types: ["msg", "flow", "global"],
+                typeField: $("#node-input-outputType")
             })
         }
     });
@@ -70,6 +77,11 @@
         <label for="node-input-hierarchicalDeterministicWalletIndex">Hierarchical Deterministic Wallet Index</label>
         <input type="text" id="node-input-hierarchicalDeterministicWalletIndex">
         <input type="hidden" id="node-input-hierarchicalDeterministicWalletIndexType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-output">Output</label>
+        <input type="text" id="node-input-output">
+        <input type="hidden" id="node-input-outputType">
     </div>
 </script>
 

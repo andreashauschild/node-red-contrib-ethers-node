@@ -213,7 +213,9 @@ export class EthersActionExecutor {
             })
         ).subscribe(async result => {
             this.node.log(`executed method '${result?.action.method}' with params '${result?.action.params}' on contract '${result?.contract.address} with tx: ${result?.txReceipt?.transactionHash}'`)
-            this.node.send({...result?.action.msg, txReceipt: result?.txReceipt})
+            let msg = {...result?.action.msg}
+            msg[this.output!?.key]=result?.txReceipt;
+            this.node.send(msg)
         });
     }
 
@@ -243,7 +245,9 @@ export class EthersActionExecutor {
             const log = `Transferred '${result?.action?.amount}' from: '${result?.txReceipt?.from}' to '${result?.txReceipt?.to}'`;
             this.node.log(log)
             this.node.status({fill: "green", shape: "ring", text: log});
-            this.node.send({...result?.action.msg, txReceipt: result?.txReceipt})
+            let msg = {...result?.action.msg}
+            msg[this.output!?.key]=result?.txReceipt;
+            this.node.send(msg)
         });
     }
 

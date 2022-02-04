@@ -21,7 +21,6 @@ module.exports = function (RED) {
             const contractAddress = config.contractAddress
             const method = config.method
             const action = EthersActionExecutor.readContractAction(abi, bytecode, contractAddress, method, params);
-
             ethersActionExecutor.executeRead(action);
         });
     }

@@ -10,7 +10,9 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         var node = this;
         this.ethCredentials = RED.nodes.getNode(config.ethCredentials);
-
+        this.rpc = RED.nodes.getNode(this.ethCredentials.rpc).rpc;
+        this.output = config.output;
+        this.outputType = config.outputType;
         var cred;
         if (this.ethCredentials.privatekey) {
             cred = createPrivateKeyCredential(this.ethCredentials.privatekey, this.ethCredentials.chainId, this.ethCredentials.rpc);
@@ -20,7 +22,10 @@ module.exports = function (RED) {
             node.error(`Credentials are not correct!`)
         }
 
-        var ethersActionExecutor = new EthersActionExecutor(cred, node);
+        var ethersActionExecutor = new EthersActionExecutor(cred,this.rpc, node,{
+            context: this.outputType,
+            key: this.output
+        });
         node.on('input', function (msg) {
             const toAddress = RED.util.evaluateNodeProperty(config.toAddress, config.toAddressType || "str", node, msg)
             const amount = RED.util.evaluateNodeProperty(config.amount, config.amountType || "str", node, msg)
