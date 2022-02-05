@@ -33,6 +33,7 @@ module.exports = function (RED) {
         });
 
         node.on('input', function (msg) {
+
             const params = RED.util.evaluateNodeProperty(config.params, config.paramsType || "json", node, msg)
             const abi = this.contract.abi;
             const bytecode = this.contract.bytecode;
@@ -43,9 +44,9 @@ module.exports = function (RED) {
 
             if (cred.type === CredentialType.MNEMONIC) {
                 const action = EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, params, hierarchicalDeterministicWalletIndex);
-                ethersActionExecutor.execute(action);
+                ethersActionExecutor.execute(action,msg);
             } else if (cred.type === CredentialType.PRIVATE_KEY) {
-                ethersActionExecutor.execute(EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, params));
+                ethersActionExecutor.execute(EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, params),msg);
             }
         });
     }

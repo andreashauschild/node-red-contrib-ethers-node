@@ -32,9 +32,9 @@ module.exports = function (RED) {
             const hierarchicalDeterministicWalletIndex = RED.util.evaluateNodeProperty(config.hierarchicalDeterministicWalletIndex, config.hierarchicalDeterministicWalletIndexType || "num", node, msg)
 
             if (cred.type === CredentialType.MNEMONIC) {
-                ethersActionExecutor.execute(EthersActionExecutor.transferAction(amount, toAddress, hierarchicalDeterministicWalletIndex));
+                ethersActionExecutor.execute(EthersActionExecutor.transferAction(amount, toAddress, hierarchicalDeterministicWalletIndex),msg);
             } else if (cred.type === CredentialType.PRIVATE_KEY) {
-                ethersActionExecutor.execute(EthersActionExecutor.transferAction(amount, toAddress));
+                ethersActionExecutor.execute(EthersActionExecutor.transferAction(amount, toAddress),msg);
             }
         });
     }

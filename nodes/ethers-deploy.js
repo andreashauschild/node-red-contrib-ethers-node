@@ -11,6 +11,9 @@ module.exports = function (RED) {
         this.contract = RED.nodes.getNode(config.contract);
         this.ethCredentials = RED.nodes.getNode(config.ethCredentials);
         this.rpc = RED.nodes.getNode(this.ethCredentials.rpc).rpc;
+        this.output = config.output;
+        this.outputType = config.outputType;
+
         var cred;
         if (this.ethCredentials.privatekey) {
             cred = createPrivateKeyCredential(this.ethCredentials.privatekey, this.ethCredentials.chainId);
@@ -20,7 +23,11 @@ module.exports = function (RED) {
             node.error(`Credentials are not correct!`)
         }
 
-        var ethersActionExecutor = new EthersActionExecutor(cred,this.rpc, node);
+        var ethersActionExecutor = new EthersActionExecutor(cred, this.rpc, node, {
+            context: this.outputType,
+            key: this.output
+        });
+
         node.on('input', function (msg) {
             const params = RED.util.evaluateNodeProperty(config.params, config.paramsType || "json", node, msg)
             const abi = this.contract.abi;
@@ -33,7 +40,7 @@ module.exports = function (RED) {
                 action.callback = (result) => console.log(result)
                 ethersActionExecutor.execute(action);
             } else if (cred.type === CredentialType.PRIVATE_KEY) {
-                ethersActionExecutor.execute(EthersActionExecutor.deployContractAction(abi, bytecode, params));
+                ethersActionExecutor.execute(EthersActionExecutor.deployContractAction(abi, bytecode, params),msg);
             }
         });
     }

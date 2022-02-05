@@ -43,7 +43,8 @@
       "ethers-deploy": "nodes/ethers-deploy.js",
       "ethers-contract": "nodes/ethers-contract.js",
       "ethers-write": "nodes/ethers-write.js",
-      "ethers-read": "nodes/ethers-read.js"
+      "ethers-read": "nodes/ethers-read.js",
+      "ethers-provider": "nodes/ethers-provider.js"
     }
   },
   "dependencies": {

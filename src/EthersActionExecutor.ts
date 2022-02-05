@@ -1,4 +1,4 @@
-import {concatMap, filter, Subject} from "rxjs";
+import {catchError, concatMap, EMPTY, filter, of, Subject, throwError} from "rxjs";
 import * as ethers from "ethers";
 
 
@@ -36,20 +36,18 @@ export enum ActionType {
     READ_CONTRACT = "READ_CONTRACT",
 }
 
-export interface OutputMapping{
-    context:'msg'|'flow'|'global'
-    key:string,
+export interface OutputMapping {
+    context: 'msg' | 'flow' | 'global'
+    key: string,
 }
 
 export interface ReadAction {
     type: ActionType
-    msg?: any,
 }
 
 export interface ModifyAction {
     type: ActionType
-    hierarchicalDeterministicWalletIndex?: number,
-    msg?: any,
+    hierarchicalDeterministicWalletIndex?: number
 }
 
 export interface TransferAction extends ModifyAction {
@@ -84,14 +82,15 @@ export class EthersActionExecutor {
     private subjects: { [key: number]: Subject<ModifyAction> } = {}
 
     private provider: ethers.providers.JsonRpcProvider;
-
+    private msg: any;
 
     constructor(private credentials: BaseCredentials, private rpc: string, private node: any, private output?: OutputMapping) {
         this.provider = new ethers.providers.JsonRpcProvider(rpc);
     }
 
-    async executeRead(a: ReadAction): Promise<any> {
-
+    async executeRead(a: ReadAction, msg: any): Promise<any> {
+        this.node.status({});
+        this.setMsg(msg);
         if (a.type === ActionType.READ_CONTRACT) {
             const action = a as ReadContractAction
             const contract = new ethers.Contract(action.contractAddress, action.abi, this.provider);
@@ -103,20 +102,19 @@ export class EthersActionExecutor {
             try {
                 const result = await contract[method](...action.params)
                 this.node.status({fill: "green", shape: "ring", text: `success`});
-                let msg = {...action.msg}
-                msg[this.output!?.key]=result;
-                this.node.send(msg)
-
+                this.setOutput(result);
             } catch (error) {
-                this.node.error(error, action.msg)
+                this.node.error(error, this.msg)
                 this.node.status({fill: "red", shape: "ring", text: `failed`});
 
             }
         }
     }
 
-    execute(action: ModifyAction) {
 
+    execute(action: ModifyAction, msg: any) {
+        this.node.status({});
+        this.setMsg(msg);
         if (this.credentials.type === CredentialType.MNEMONIC && action.hierarchicalDeterministicWalletIndex == null) {
             this.node.error(`Node use credentials of type '${CredentialType.MNEMONIC}', but the action does not provide a 'hierarchicalDeterministicWalletIndex'. Action will not be executed!`)
             return;
@@ -151,7 +149,6 @@ export class EthersActionExecutor {
                     this.subscribeWriteContractHandler(this.subjects[0]);
                 }
                 this.subjects[0].next(action);
-
             }
         }
 
@@ -161,94 +158,145 @@ export class EthersActionExecutor {
     private subscribeDeployContractHandler(subject: Subject<ModifyAction>) {
         subject.pipe(filter(a => a != null && a.type === ActionType.DEPLOY_CONTRACT),
             concatMap(async a => {
-                let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
-                const action = a as unknown as DeployContractAction;
-                const wallet = this.wallets[walletIndex];
+                try {
+                    let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
+                    const action = a as unknown as DeployContractAction;
+                    const wallet = this.wallets[walletIndex];
 
-                const factory = new ethers.ContractFactory(action.abi, action.bytecode, wallet);
+                    const factory = new ethers.ContractFactory(action.abi, action.bytecode, wallet);
 
-                this.node.status({fill: "yellow", shape: "ring", text: "deploying"});
+                    this.node.status({fill: "yellow", shape: "ring", text: "deploying"});
 
-                const contract = await factory.deploy(...action.constructorParameter);
+                    const contract = await factory.deploy(...action.constructorParameter);
 
-                const tx = contract.deployTransaction
-                this.node.log(`Deploy contract to '${contract.address}' with hash: '${tx.hash}', gasLimit '${tx.gasLimit.toString()}', gasPrice:'${tx.gasLimit.toString()}'`)
+                    const tx = contract.deployTransaction
+                    this.node.log(`Deploy contract to '${contract.address}' with hash: '${tx.hash}', gasLimit '${tx.gasLimit.toString()}', gasPrice:'${tx.gasLimit.toString()}'`)
 
-                return contract.deployTransaction.wait().then(txReceipt => {
-                    this.node.status({fill: "green", shape: "ring", text: `deployed ${contract.address}`});
-                    return {txReceipt, action, contract}
-                }).catch(e => {
-                    this.node.error(e, action.msg)
+                    return contract.deployTransaction.wait().then(txReceipt => {
+                        this.node.status({fill: "green", shape: "ring", text: `deployed ${contract.address}`});
+                        return {txReceipt, action, contract}
+                    }).catch(e => {
+                        this.node.error(e, this.msg)
+                        this.node.status({fill: "red", shape: "ring", text: `failed`});
+                    });
+                } catch (e) {
+                    this.node.error(e, this.msg);
                     this.node.status({fill: "red", shape: "ring", text: `failed`});
-                });
+                    return undefined;
+                }
             })
-        ).subscribe(async result => {
+        ).subscribe(result => {
             this.node.log(`Deployed contract to '${result?.contract.address}'`)
-            this.node.send({...result?.action.msg, txReceipt: result?.txReceipt})
-        });
+            this.setOutput(result?.txReceipt);
+        })
     }
 
     private subscribeWriteContractHandler(subject: Subject<ModifyAction>) {
+
         subject.pipe(filter(a => a != null && a.type === ActionType.WRITE_CONTRACT),
             concatMap(async a => {
-                let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
-                const action = a as unknown as WriteContractAction;
-                const wallet = this.wallets[walletIndex];
+                try {
+                    let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
+                    const action = a as unknown as WriteContractAction;
+                    const wallet = this.wallets[walletIndex];
 
-                const contract = new ethers.Contract(action.contractAddress, action.abi, wallet);
+                    const contract = new ethers.Contract(action.contractAddress, action.abi, wallet);
 
-                this.node.log(`execute method '${action.method}' with params '${action.params}' on contract '${contract.address}'`)
-                this.node.status({fill: "yellow", shape: "ring", text: "writing"});
-                let method = action.method
-                method = method.replace(/\s/g, '');
+                    this.node.log(`execute method '${action.method}' with params '${action.params}' on contract '${contract.address}'`)
+                    this.node.status({fill: "yellow", shape: "ring", text: "writing"});
+                    let method = action.method
+                    method = method.replace(/\s/g, '');
 
-                const resp: ethers.providers.TransactionResponse = await contract[method](...action.params)
-                return resp.wait().then(txReceipt => {
-                    this.node.status({fill: "green", shape: "ring", text: `success`});
-                    return {txReceipt, action, contract}
-                }).catch(e => {
-                    this.node.error(e, action.msg)
+
+                    const resp: ethers.providers.TransactionResponse = await contract[method](...action.params);
+
+                    return resp.wait().then(txReceipt => {
+                        this.node.status({fill: "green", shape: "ring", text: `success`});
+                        return {txReceipt, action, contract}
+                    }).catch(e => {
+                        this.node.error(e, this.msg)
+                        this.node.status({fill: "red", shape: "ring", text: `failed`});
+                    });
+                } catch (e) {
+                    this.node.error(e, this.msg);
                     this.node.status({fill: "red", shape: "ring", text: `failed`});
-                });
+                    return undefined;
+                }
             })
-        ).subscribe(async result => {
-            this.node.log(`executed method '${result?.action.method}' with params '${result?.action.params}' on contract '${result?.contract.address} with tx: ${result?.txReceipt?.transactionHash}'`)
-            let msg = {...result?.action.msg}
-            msg[this.output!?.key]=result?.txReceipt;
-            this.node.send(msg)
-        });
+        ).subscribe(result => {
+            if (result) {
+                this.node.log(`executed method '${result?.action.method}' with params '${result?.action.params}' on contract '${result?.contract.address} with tx: ${result?.txReceipt?.transactionHash}'`)
+                this.setOutput(result?.txReceipt);
+            }
+        })
     }
 
     private subscribeTransferHandler(subject: Subject<ModifyAction>) {
         subject.pipe(filter(a => a != null && a.type === ActionType.TRANSFER),
             concatMap(async a => {
-                let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
-                const action = a as unknown as TransferAction;
-                const wallet = this.wallets[walletIndex];
+                try {
+                    let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
+                    const action = a as unknown as TransferAction;
+                    const wallet = this.wallets[walletIndex];
 
-                const log = `Transfer '${action.amount}' from: '${wallet.address}' to '${action.to}'`
-                this.node.log(log)
-                this.node.status({fill: "yellow", shape: "ring", text: log});
-                const tx = await wallet.sendTransaction({
-                    to: action.to,
-                    from: wallet.address,
-                    value: ethers.utils.parseEther(action.amount)
-                })
-                return this.provider.waitForTransaction(tx.hash).then(txReceipt => {
-                    return {txReceipt, action}
-                }).catch(e => {
-                    this.node.error(e, action.msg)
+                    const log = `Transfer '${action.amount}' from: '${wallet.address}' to '${action.to}'`
+                    this.node.log(log)
+                    this.node.status({fill: "yellow", shape: "ring", text: log});
+                    const tx = await wallet.sendTransaction({
+                        to: action.to,
+                        from: wallet.address,
+                        value: ethers.utils.parseEther(action.amount)
+                    })
+                    return this.provider.waitForTransaction(tx.hash).then(txReceipt => {
+                        return {txReceipt, action}
+                    }).catch(e => {
+                        this.node.error(e, this.msg)
+                        this.node.status({fill: "red", shape: "ring", text: `failed`});
+                    });
+                } catch (e) {
+                    this.node.error(e, this.msg);
                     this.node.status({fill: "red", shape: "ring", text: `failed`});
-                });
+                    return undefined;
+                }
             })
-        ).subscribe(async result => {
-            const log = `Transferred '${result?.action?.amount}' from: '${result?.txReceipt?.from}' to '${result?.txReceipt?.to}'`;
-            this.node.log(log)
-            this.node.status({fill: "green", shape: "ring", text: log});
-            let msg = {...result?.action.msg}
-            msg[this.output!?.key]=result?.txReceipt;
-            this.node.send(msg)
+        ).subscribe(result => {
+            if (result) {
+                const log = `Transferred '${result?.action?.amount}' from: '${result?.txReceipt?.from}' to '${result?.txReceipt?.to}'`;
+                this.node.log(log)
+                this.node.status({fill: "green", shape: "ring", text: log});
+                this.setOutput(result?.txReceipt);
+            }
         });
+    }
+
+    private setOutput(result: any): void {
+        if (this.output) {
+            switch (this.output.context) {
+                case "msg": {
+                    console.log(this.msg);
+                    this.msg[this.output!?.key] = result;
+                    this.node.send(this.msg);
+                    break;
+                }
+                case "flow": {
+                    this.node.context().flow.set(this.output.key, result);
+                    this.node.send(this.msg);
+                    break;
+                }
+                case "global": {
+                    this.node.context().global.set(this.output.key, result);
+                    this.node.send(this.msg);
+                    break;
+                }
+            }
+        }
+    }
+
+    private setMsg(msg: any): void {
+        this.msg = msg;
+        if (!this.msg) {
+            throw Error("can not execute Read. Message need to be provided")
+        }
     }
 
     public static transferAction(amount: string, to: string, hierarchicalDeterministicWalletIndex?: number): TransferAction {

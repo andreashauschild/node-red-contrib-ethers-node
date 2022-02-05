@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ethers-provider', {
+        category: 'ethers',
+        color: '#e5e5e5',
+        defaults: {
+            name: {value: ""},
+            ethersKey: {value: "ethers", required: false},
+        },
+        inputs: 0,
+        outputs: 0,
+        icon: "file.png",
+        label: function () {
+            return this.name || "ethers-provider";
+        },
+        oneditprepare: function () {}
+    });
+</script>
+
+<script type="text/html" data-template-name="ethers-provider">
+    <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-ethersKey">Ethers Context Key</label>
+        <input type="text" id="node-input-ethersKey">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="ethers-provider">
+    <p>Provides external lib like 'ethers' to global context.</p>
+</script>
