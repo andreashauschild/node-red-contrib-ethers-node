@@ -1,4 +1,4 @@
-import {catchError, concatMap, EMPTY, filter, of, Subject, throwError} from "rxjs";
+import {concatMap, filter, Subject} from "rxjs";
 import * as ethers from "ethers";
 import {EventFilter} from "ethers";
 
@@ -44,7 +44,7 @@ export interface OutputMapping {
 }
 
 export interface ReadAction {
-    type: ActionType
+    type: ActionType.READ_CONTRACT_EVENT | ActionType.READ_CONTRACT
 }
 
 export interface ModifyAction {
@@ -85,6 +85,9 @@ export interface ReadContractEvent extends ReadAction {
     contractAddress: string,
     contractCreationTx: string,
     event: string,
+    blockFrom: number,
+    blockTo: number,
+    blockRange: number,
     params?: any,
 }
 
@@ -125,7 +128,7 @@ export class EthersActionExecutor {
                 const action = a as ReadContractEvent
                 const contract = new ethers.Contract(action.contractAddress, action.abi, this.provider);
                 const tx = await this.provider.getTransactionReceipt(action.contractCreationTx);
-                if(!tx){
+                if (!tx) {
                     throw new Error(`Could not find TxReceipt for hash: ${action.contractCreationTx}`)
                 }
                 this.node.status({fill: "yellow", shape: "ring", text: "reading"});
@@ -134,15 +137,39 @@ export class EthersActionExecutor {
 
                 console.log(contract.deployTransaction)
 
-                const filter = await contract.filters[event]() as EventFilter //  execute function here '()' to get the filter
-                const events = await contract.queryFilter(filter, tx.blockNumber, tx.blockNumber+3400);
+                let filter = {}
+                if (event?.length) {
+                    filter = await contract.filters[event]() as EventFilter //  execute function here '()' to get the filter
+                }
 
-                // This would filter all events
-                // const events = await contract.queryFilter({}, tx.blockNumber, tx.blockNumber+3400);
+                let currentBlockNumber = this.provider.blockNumber;
+                let from = !action.blockFrom ? tx.blockNumber : action.blockFrom;
+                let to = !action.blockTo ? currentBlockNumber : action.blockTo;
+                let range = !action.blockRange ? 3499 : action.blockRange;
+                let blocks = to - from;
+                let steps = Math.ceil(blocks / range);
+                console.log(`Filter from '${this.fn(from)}' to '${this.fn(to)}' range ${range} blocks: ${this.fn(blocks)} calls: '${this.fn(steps)}'`)
+                let next = from;
+                let events: any;
+                let status: string = '';
+                let count=0;
+                for (let i = 1; i <= steps; i++) {
+                    if (currentBlockNumber > (next + range)) {
+                        events = await contract.queryFilter(filter, next, next + range);
+                    } else {
+                        events = await contract.queryFilter(filter, next, next + range);
+                    }
+                    count+=events.length;
+                    status = `[${i}/${steps}] - [${this.fn(next)}/${this.fn(next + range)}] found: '${count}'`;
+                    this.node.status({fill: "yellow", shape: "ring", text: status});
+                    console.log(status)
+                    if(events.length>0){
+                        this.setOutput(events);
+                    }
+                    next += range
+                }
 
-                console.log("------->",events.length)
-                this.node.status({fill: "green", shape: "ring", text: `success`});
-                this.setOutput(events);
+                this.node.status({fill: "green", shape: "ring", text: status});
             } catch (error) {
                 this.node.error(error, this.msg)
                 this.node.status({fill: "red", shape: "ring", text: `failed`});
@@ -313,7 +340,6 @@ export class EthersActionExecutor {
         if (this.output) {
             switch (this.output.context) {
                 case "msg": {
-                    console.log(this.msg);
                     this.msg[this.output!?.key] = result;
                     this.node.send(this.msg);
                     break;
@@ -337,6 +363,10 @@ export class EthersActionExecutor {
         if (!this.msg) {
             throw Error("can not execute Read. Message need to be provided")
         }
+    }
+
+    private fn(num: string | number) {
+        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
     }
 
     public static transferAction(amount: string, to: string, hierarchicalDeterministicWalletIndex?: number): TransferAction {
@@ -377,18 +407,6 @@ export class EthersActionExecutor {
             bytecode,
             contractAddress,
             method,
-            params,
-        }
-    }
-
-    public static readContractEvent(abi: any, bytecode: string, contractAddress: string, contractCreationTx: string, event: string, params?: any): ReadContractEvent {
-        return {
-            type: ActionType.READ_CONTRACT_EVENT,
-            abi,
-            bytecode,
-            contractAddress,
-            contractCreationTx,
-            event,
             params,
         }
     }

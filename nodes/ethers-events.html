@@ -10,7 +10,7 @@
             rpc: {
                 type: "ethers-rpc", required: true
             },
-            event: {value: "", required: true},
+            event: {value: "", required: false},
             contractAddress: {value: "", required: true},
             contractAddressType: {value: "str", required: true},
             contractCreationTx: {value: "", required: true},
@@ -19,6 +19,12 @@
             paramsType: {value: 'json'},
             output: {value: "payload", required: false},
             outputType: {value: 'msg'},
+            blockFrom: {value: "", required: false},
+            blockFromType: {value: "num", required: true},
+            blockTo: {value: "", required: false},
+            blockToType: {value: "num", required: true},
+            blockRange: {value: "", required: false},
+            blockRangeType: {value: "num", required: true},
 
         },
         inputs: 1,
@@ -42,6 +48,21 @@
                 default: 'str',
                 types: ["str","msg", "flow", "global"],
                 typeField: $("#node-input-contractCreationTxType")
+            })
+            $("#node-input-blockFrom").typedInput({
+                default: 'num',
+                types: ["num","msg", "flow", "global"],
+                typeField: $("#node-input-blockFromType")
+            })
+            $("#node-input-blockTo").typedInput({
+                default: 'num',
+                types: ["num","msg", "flow", "global"],
+                typeField: $("#node-input-blockToType")
+            })
+            $("#node-input-blockRange").typedInput({
+                default: 'num',
+                types: ["num","msg", "flow", "global"],
+                typeField: $("#node-input-blockRangeType")
             })
             $("#node-input-output").typedInput({
                 default: 'msg',
@@ -74,6 +95,21 @@
         <label for="node-input-contractCreationTx">Contract Creation Tx</label>
         <input type="text" id="node-input-contractCreationTx">
         <input type="hidden" id="node-input-contractCreationTxType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-blockFrom">Block From</label>
+        <input type="text" id="node-input-blockFrom">
+        <input type="hidden" id="node-input-blockFromType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-blockTo">Block To</label>
+        <input type="text" id="node-input-blockTo">
+        <input type="hidden" id="node-input-blockToType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-blockRange">Block Range</label>
+        <input type="text" id="node-input-blockRange">
+        <input type="hidden" id="node-input-blockRangeType">
     </div>
     <div class="form-row">
         <label for="node-input-event">Event</label>

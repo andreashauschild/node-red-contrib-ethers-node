@@ -1,5 +1,5 @@
 const {
-    EthersActionExecutor
+    EthersActionExecutor, ActionType
 } = require("../dist/src/EthersActionExecutor");
 module.exports = function (RED) {
     function EthersEventsNode(config) {
@@ -20,9 +20,24 @@ module.exports = function (RED) {
             const bytecode = this.contract.bytecode;
             const contractAddress = RED.util.evaluateNodeProperty(config.contractAddress, config.contractAddressType || "str", node, msg)
             const contractCreationTx = RED.util.evaluateNodeProperty(config.contractCreationTx, config.contractCreationTxType || "str", node, msg)
+
+            const blockFrom = RED.util.evaluateNodeProperty(config.blockFrom, config.blockFromType || "num", node, msg)
+            const blockTo = RED.util.evaluateNodeProperty(config.blockTo, config.blockToType || "num", node, msg)
+            const blockRange = RED.util.evaluateNodeProperty(config.blockRange, config.blockRangeType || "num", node, msg)
+
             const event = config.event
-            const action = EthersActionExecutor.readContractEvent(abi, bytecode, contractAddress, contractCreationTx, event, params);
-            ethersActionExecutor.executeRead(action, msg);
+            ethersActionExecutor.executeRead({
+                type: ActionType.READ_CONTRACT_EVENT,
+                abi,
+                bytecode,
+                contractAddress,
+                contractCreationTx,
+                event,
+                blockFrom,
+                blockTo,
+                blockRange,
+                params,
+            }, msg);
         });
     }
 
