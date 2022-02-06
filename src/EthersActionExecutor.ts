@@ -133,10 +133,13 @@ export class EthersActionExecutor {
                 event = event.replace(/\s/g, '');
 
                 console.log(contract.deployTransaction)
+
                 const filter = await contract.filters[event]() as EventFilter //  execute function here '()' to get the filter
-                console.log("--->",contract.filters)
-                // const events = await contract.queryFilter(filter, tx.blockNumber, tx.blockNumber+3400);
-                const events = await contract.queryFilter(filter, this.provider.blockNumber-200);
+                const events = await contract.queryFilter(filter, tx.blockNumber, tx.blockNumber+3400);
+
+                // This would filter all events
+                // const events = await contract.queryFilter({}, tx.blockNumber, tx.blockNumber+3400);
+
                 console.log("------->",events.length)
                 this.node.status({fill: "green", shape: "ring", text: `success`});
                 this.setOutput(events);
