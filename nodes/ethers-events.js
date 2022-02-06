@@ -2,7 +2,7 @@ const {
     EthersActionExecutor
 } = require("../dist/src/EthersActionExecutor");
 module.exports = function (RED) {
-    function EthersReadNode(config) {
+    function EthersEventsNode(config) {
         RED.nodes.createNode(this, config);
         var node = this;
 
@@ -19,11 +19,12 @@ module.exports = function (RED) {
             const abi = this.contract.abi;
             const bytecode = this.contract.bytecode;
             const contractAddress = RED.util.evaluateNodeProperty(config.contractAddress, config.contractAddressType || "str", node, msg)
-            const method = config.method
-            const action = EthersActionExecutor.readContractAction(abi, bytecode, contractAddress, method, params);
-            ethersActionExecutor.executeRead(action,msg);
+            const contractCreationTx = RED.util.evaluateNodeProperty(config.contractCreationTx, config.contractCreationTxType || "str", node, msg)
+            const event = config.event
+            const action = EthersActionExecutor.readContractEvent(abi, bytecode, contractAddress, contractCreationTx, event, params);
+            ethersActionExecutor.executeRead(action, msg);
         });
     }
 
-    RED.nodes.registerType("ethers-read", EthersReadNode);
+    RED.nodes.registerType("ethers-events", EthersEventsNode);
 }

@@ -1,5 +1,6 @@
 import {catchError, concatMap, EMPTY, filter, of, Subject, throwError} from "rxjs";
 import * as ethers from "ethers";
+import {EventFilter} from "ethers";
 
 
 export function createMnemonicCredential(mnemonic: string, chainId: number): MnemonicCredentials {
@@ -34,6 +35,7 @@ export enum ActionType {
     DEPLOY_CONTRACT = "DEPLOY_CONTRACT",
     WRITE_CONTRACT = "WRITE_CONTRACT",
     READ_CONTRACT = "READ_CONTRACT",
+    READ_CONTRACT_EVENT = "READ_CONTRACT_EVENT",
 }
 
 export interface OutputMapping {
@@ -77,6 +79,16 @@ export interface ReadContractAction extends ReadAction {
     params?: any,
 }
 
+export interface ReadContractEvent extends ReadAction {
+    abi: any,
+    bytecode: string,
+    contractAddress: string,
+    contractCreationTx: string,
+    event: string,
+    params?: any,
+}
+
+
 export class EthersActionExecutor {
     private wallets: { [key: number]: ethers.ethers.Wallet } = {}
     private subjects: { [key: number]: Subject<ModifyAction> } = {}
@@ -92,22 +104,47 @@ export class EthersActionExecutor {
         this.node.status({});
         this.setMsg(msg);
         if (a.type === ActionType.READ_CONTRACT) {
-            const action = a as ReadContractAction
-            const contract = new ethers.Contract(action.contractAddress, action.abi, this.provider);
-
-            this.node.status({fill: "yellow", shape: "ring", text: "reading"});
-
-            let method = action.method
-            method = method.replace(/\s/g, '');
             try {
+                const action = a as ReadContractAction
+                const contract = new ethers.Contract(action.contractAddress, action.abi, this.provider);
+
+                this.node.status({fill: "yellow", shape: "ring", text: "reading"});
+
+                let method = action.method
+                method = method.replace(/\s/g, '');
+
                 const result = await contract[method](...action.params)
                 this.node.status({fill: "green", shape: "ring", text: `success`});
                 this.setOutput(result);
             } catch (error) {
                 this.node.error(error, this.msg)
                 this.node.status({fill: "red", shape: "ring", text: `failed`});
-
             }
+        } else if (a.type === ActionType.READ_CONTRACT_EVENT) {
+            try {
+                const action = a as ReadContractEvent
+                const contract = new ethers.Contract(action.contractAddress, action.abi, this.provider);
+                const tx = await this.provider.getTransactionReceipt(action.contractCreationTx);
+                if(!tx){
+                    throw new Error(`Could not find TxReceipt for hash: ${action.contractCreationTx}`)
+                }
+                this.node.status({fill: "yellow", shape: "ring", text: "reading"});
+                let event = action.event
+                event = event.replace(/\s/g, '');
+
+                console.log(contract.deployTransaction)
+                const filter = await contract.filters[event]() as EventFilter //  execute function here '()' to get the filter
+                console.log("--->",contract.filters)
+                // const events = await contract.queryFilter(filter, tx.blockNumber, tx.blockNumber+3400);
+                const events = await contract.queryFilter(filter, this.provider.blockNumber-200);
+                console.log("------->",events.length)
+                this.node.status({fill: "green", shape: "ring", text: `success`});
+                this.setOutput(events);
+            } catch (error) {
+                this.node.error(error, this.msg)
+                this.node.status({fill: "red", shape: "ring", text: `failed`});
+            }
+
         }
     }
 
@@ -337,6 +374,18 @@ export class EthersActionExecutor {
             bytecode,
             contractAddress,
             method,
+            params,
+        }
+    }
+
+    public static readContractEvent(abi: any, bytecode: string, contractAddress: string, contractCreationTx: string, event: string, params?: any): ReadContractEvent {
+        return {
+            type: ActionType.READ_CONTRACT_EVENT,
+            abi,
+            bytecode,
+            contractAddress,
+            contractCreationTx,
+            event,
             params,
         }
     }

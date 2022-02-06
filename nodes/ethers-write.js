@@ -37,7 +37,7 @@ module.exports = function (RED) {
             const params = RED.util.evaluateNodeProperty(config.params, config.paramsType || "json", node, msg)
             const abi = this.contract.abi;
             const bytecode = this.contract.bytecode;
-            const contractAddress = config.contractAddress
+            const contractAddress = RED.util.evaluateNodeProperty(config.contractAddress, config.contractAddressType || "str", node, msg)
             const method = config.method
             const hierarchicalDeterministicWalletIndex = RED.util.evaluateNodeProperty(config.hierarchicalDeterministicWalletIndex, config.hierarchicalDeterministicWalletIndexType || "num", node, msg)
 

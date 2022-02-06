@@ -660,7 +660,7 @@ describe("Greeter", function () {
         let method = 'mint( address, uint256)'
         method = method.replace(/\s/g, '');
 
-        const tx = await (contract as unknown as EnieToken).transfer(user.address,'1');
+        const tx = await (contract as unknown as EnieToken).transfer('0xb9e0503bd4a5b3ab57254fd99160d6a40bf9d443','1');
         await tx.wait();
 
         await contract[method](...[owner.address, 10]);
@@ -671,8 +671,8 @@ describe("Greeter", function () {
         const events  =await contract.queryFilter(typedEventFilter,contract.deployTransaction.blockNumber);
 
         console.log("-------------------------------------------------")
-        console.log(events)
-        events[1].eventSignature
+        console.log(events.length)
+
         console.log("-------------------------------------------------")
 
     });
