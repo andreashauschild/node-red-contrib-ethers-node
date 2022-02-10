@@ -36,6 +36,7 @@ export enum ActionType {
     WRITE_CONTRACT = "WRITE_CONTRACT",
     READ_CONTRACT = "READ_CONTRACT",
     READ_CONTRACT_EVENT = "READ_CONTRACT_EVENT",
+    READ_ACCOUNT = "READ_ACCOUNT",
 }
 
 export interface OutputMapping {
@@ -44,7 +45,7 @@ export interface OutputMapping {
 }
 
 export interface ReadAction {
-    type: ActionType.READ_CONTRACT_EVENT | ActionType.READ_CONTRACT
+    type: ActionType.READ_CONTRACT_EVENT | ActionType.READ_CONTRACT | ActionType.READ_ACCOUNT
 }
 
 export interface ModifyAction {
@@ -78,6 +79,12 @@ export interface ReadContractAction extends ReadAction {
     method: string,
     params?: any,
 }
+
+export interface ReadAccountAction extends ReadAction {
+    accountAddress: string,
+    method: string,
+}
+
 
 export interface ReadContractEvent extends ReadAction {
     abi: any,
@@ -123,6 +130,29 @@ export class EthersActionExecutor {
                 this.node.error(error, this.msg)
                 this.node.status({fill: "red", shape: "ring", text: `failed`});
             }
+        } else if (a.type === ActionType.READ_ACCOUNT) {
+            try {
+                const action = a as ReadAccountAction;
+
+                if (action.method === 'balance') {
+                    this.node.status({fill: "yellow", shape: "ring", text: "reading"});
+                    const result = await this.provider.getBalance(action.accountAddress);
+                    this.node.status({
+                        fill: "green",
+                        shape: "ring",
+                        text: `Balance: ${ethers.utils.formatEther(result.toString())}`
+                    });
+                    this.setOutput(result);
+                } else if (action.method === 'transactionCount') {
+                    this.node.status({fill: "yellow", shape: "ring", text: "reading"});
+                    const result = await this.provider.getTransactionCount(action.accountAddress);
+                    this.node.status({fill: "green", shape: "ring", text: `Tx Count: ${result}`});
+                    this.setOutput(result);
+                }
+            } catch (error) {
+                this.node.error(error, this.msg)
+                this.node.status({fill: "red", shape: "ring", text: `failed`});
+            }
         } else if (a.type === ActionType.READ_CONTRACT_EVENT) {
             try {
                 const action = a as ReadContractEvent
@@ -152,18 +182,18 @@ export class EthersActionExecutor {
                 let next = from;
                 let events: any;
                 let status: string = '';
-                let count=0;
+                let count = 0;
                 for (let i = 1; i <= steps; i++) {
                     if (currentBlockNumber > (next + range)) {
                         events = await contract.queryFilter(filter, next, next + range);
                     } else {
                         events = await contract.queryFilter(filter, next, next + range);
                     }
-                    count+=events.length;
+                    count += events.length;
                     status = `[${i}/${steps}] - [${this.fn(next)}/${this.fn(next + range)}] found: '${count}'`;
                     this.node.status({fill: "yellow", shape: "ring", text: status});
                     console.log(status)
-                    if(events.length>0){
+                    if (events.length > 0) {
                         this.setOutput(events);
                     }
                     next += range

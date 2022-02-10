@@ -1,0 +1,71 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ethers-read-account', {
+        category: 'ethers',
+        color: '#00ffd8',
+        defaults: {
+            name: {value: ""},
+            rpc: {
+                type: "ethers-rpc", required: true
+            },
+            method: {value: "", required: true},
+            accountAddress: {value: "", required: true},
+            accountAddressType: {value: "str", required: true},
+            output: {value: "payload", required: false},
+            outputType: {value: 'msg'},
+
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file.png",
+        label: function () {
+            return this.name || "ethers-read-account";
+        },
+        oneditprepare: function () {
+            $("#node-input-accountAddress").typedInput({
+                default: 'str',
+                types: ["str","msg", "flow", "global"],
+                typeField: $("#node-input-accountAddressType")
+            })
+            $("#node-input-output").typedInput({
+                default: 'msg',
+                types: ["msg", "flow", "global"],
+                typeField: $("#node-input-outputType")
+            })
+            $("#node-input-method").typedInput({ types:[{
+                    value: "method",
+                    options: [
+                        { value: "balance", label: "Balance"},
+                        { value: "transactionCount", label: "Transaction Count"},
+                    ]
+                }]})
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="ethers-read-account">
+    <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-rpc">RPC</label>
+        <input type="text" id="node-input-rpc">
+    </div>
+    <div class="form-row">
+        <label for="node-input-accountAddress">Account</label>
+        <input type="text" id="node-input-accountAddress">
+    </div>
+    <div class="form-row">
+        <label for="node-input-method">Method</label>
+        <input type="text" id="node-input-method">
+    </div>
+    <div class="form-row">
+        <label for="node-input-output">Output</label>
+        <input type="text" id="node-input-output">
+        <input type="hidden" id="node-input-outputType">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="ethers-read-account">
+    <p>Node to read data from smart contract</p>
+</script>
