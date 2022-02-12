@@ -35,15 +35,19 @@
     "url": "https://github.com/andreashauschild/node-red-contrib-ethers-node/issues"
   },
   "homepage": "https://github.com/andreashauschild/node-red-contrib-ethers-node#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "node-red": {
+    "version": ">=2.0.0",
     "nodes": {
       "transfer": "nodes/ethers-transfer.js",
       "ethers-credentials": "nodes/ethers-credentials.js",
       "ethers-rpc": "nodes/ethers-rpc.js",
       "ethers-deploy": "nodes/ethers-deploy.js",
       "ethers-contract": "nodes/ethers-contract.js",
-      "ethers-write": "nodes/ethers-write.js",
-      "ethers-read": "nodes/ethers-read.js",
+      "ethers-write-contract": "nodes/ethers-write-contract.js",
+      "ethers-read-contract": "nodes/ethers-read-contract.js",
       "ethers-read-account": "nodes/ethers-read-account.js",
       "ethers-events": "nodes/ethers-events.js",
       "ethers-provider": "nodes/ethers-provider.js"

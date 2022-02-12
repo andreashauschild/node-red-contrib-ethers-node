@@ -69,6 +69,7 @@ export interface WriteContractAction extends ModifyAction {
     bytecode: string,
     contractAddress: string,
     method: string,
+    payment: string,
     params?: any,
 }
 
@@ -271,7 +272,7 @@ export class EthersActionExecutor {
 
                     return contract.deployTransaction.wait().then(txReceipt => {
                         this.node.status({fill: "green", shape: "ring", text: `deployed ${contract.address}`});
-                        return {txReceipt, action, contract}
+                        return {txReceipt, action, contract} as any
                     }).catch(e => {
                         this.node.error(e, this.msg)
                         this.node.status({fill: "red", shape: "ring", text: `failed`});
@@ -283,7 +284,7 @@ export class EthersActionExecutor {
                 }
             })
         ).subscribe(result => {
-            this.node.log(`Deployed contract to '${result?.contract.address}'`)
+            this.node.log(`Deployed contract to '${result?.contract?.address}'`)
             this.setOutput(result?.txReceipt);
         })
     }
@@ -304,8 +305,12 @@ export class EthersActionExecutor {
                     let method = action.method
                     method = method.replace(/\s/g, '');
 
-
-                    const resp: ethers.providers.TransactionResponse = await contract[method](...action.params);
+                    let resp: ethers.providers.TransactionResponse;
+                    if (action.payment) {
+                        resp = await contract[method](...action.params, {value: ethers.utils.parseEther(action.payment)});
+                    } else {
+                        resp = await contract[method](...action.params);
+                    }
 
                     return resp.wait().then(txReceipt => {
                         this.node.status({fill: "green", shape: "ring", text: `success`});
@@ -418,13 +423,14 @@ export class EthersActionExecutor {
         }
     }
 
-    public static writeContractAction(abi: any, bytecode: string, contractAddress: string, method: string, params?: any, hierarchicalDeterministicWalletIndex?: number): WriteContractAction {
+    public static writeContractAction(abi: any, bytecode: string, contractAddress: string, method: string, payment: string, params?: any, hierarchicalDeterministicWalletIndex?: number): WriteContractAction {
         return {
             type: ActionType.WRITE_CONTRACT,
             abi,
             bytecode,
             contractAddress,
             method,
+            payment,
             params,
             hierarchicalDeterministicWalletIndex
         }

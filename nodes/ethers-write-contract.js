@@ -5,7 +5,7 @@ const {
     CredentialType
 } = require("../dist/src/EthersActionExecutor");
 module.exports = function (RED) {
-    function EthersWriteNode(config) {
+    function EthersWriteContractNode(config) {
         RED.nodes.createNode(this, config);
         var node = this;
 
@@ -35,6 +35,7 @@ module.exports = function (RED) {
         node.on('input', function (msg) {
 
             const params = RED.util.evaluateNodeProperty(config.params, config.paramsType || "json", node, msg)
+            const payment = RED.util.evaluateNodeProperty(config.payment, config.paramsType || "str", node, msg)
             const abi = this.contract.abi;
             const bytecode = this.contract.bytecode;
             const contractAddress = RED.util.evaluateNodeProperty(config.contractAddress, config.contractAddressType || "str", node, msg)
@@ -51,5 +52,5 @@ module.exports = function (RED) {
         });
     }
 
-    RED.nodes.registerType("ethers-write", EthersWriteNode);
+    RED.nodes.registerType("ethers-write-contract", EthersWriteContractNode);
 }
