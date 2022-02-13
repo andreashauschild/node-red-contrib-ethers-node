@@ -33,9 +33,11 @@ module.exports = function (RED) {
         });
 
         node.on('input', function (msg) {
-
+            console.log("PAYMENT",config.payment)
             const params = RED.util.evaluateNodeProperty(config.params, config.paramsType || "json", node, msg)
-            const payment = RED.util.evaluateNodeProperty(config.payment, config.paramsType || "str", node, msg)
+
+            const payment = RED.util.evaluateNodeProperty(config.payment, config.paymentType || "str", node, msg)
+            console.log("PAYMENT",config.payment)
             const abi = this.contract.abi;
             const bytecode = this.contract.bytecode;
             const contractAddress = RED.util.evaluateNodeProperty(config.contractAddress, config.contractAddressType || "str", node, msg)
@@ -44,10 +46,10 @@ module.exports = function (RED) {
 
 
             if (cred.type === CredentialType.MNEMONIC) {
-                const action = EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, params, hierarchicalDeterministicWalletIndex);
+                const action = EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, payment,params, hierarchicalDeterministicWalletIndex);
                 ethersActionExecutor.execute(action,msg);
             } else if (cred.type === CredentialType.PRIVATE_KEY) {
-                ethersActionExecutor.execute(EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, params),msg);
+                ethersActionExecutor.execute(EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, payment,params),msg);
             }
         });
     }

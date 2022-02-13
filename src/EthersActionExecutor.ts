@@ -158,10 +158,14 @@ export class EthersActionExecutor {
             try {
                 const action = a as ReadContractEvent
                 const contract = new ethers.Contract(action.contractAddress, action.abi, this.provider);
-                const tx = await this.provider.getTransactionReceipt(action.contractCreationTx);
-                if (!tx) {
-                    throw new Error(`Could not find TxReceipt for hash: ${action.contractCreationTx}`)
+                let tx;
+                if(action.contractCreationTx){
+                    tx = await this.provider.getTransactionReceipt(action.contractCreationTx);
+                    if (!tx) {
+                        throw new Error(`Could not find TxReceipt for hash: ${action.contractCreationTx}`)
+                    }
                 }
+
                 this.node.status({fill: "yellow", shape: "ring", text: "reading"});
                 let event = action.event
                 event = event.replace(/\s/g, '');
@@ -172,9 +176,14 @@ export class EthersActionExecutor {
                 if (event?.length) {
                     filter = await contract.filters[event]() as EventFilter //  execute function here '()' to get the filter
                 }
-
+                let from = this.provider.blockNumber;
                 let currentBlockNumber = this.provider.blockNumber;
-                let from = !action.blockFrom ? tx.blockNumber : action.blockFrom;
+                if(action.blockFrom){
+                    from = action.blockFrom;
+                } else if(tx?.blockNumber){
+                    from = tx.blockNumber;
+                }
+
                 let to = !action.blockTo ? currentBlockNumber : action.blockTo;
                 let range = !action.blockRange ? 3499 : action.blockRange;
                 let blocks = to - from;
