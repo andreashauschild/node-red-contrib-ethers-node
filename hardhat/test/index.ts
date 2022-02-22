@@ -1,6 +1,6 @@
 import {ethers} from "hardhat";
 import {EnieToken, EnieToken__factory} from "../typechain-types";
-import {CredentialType, EthersActionExecutor, PrivateKeyCredentials} from "../../src/EthersActionExecutor";
+import {CredentialType, EthersActionExecutor, PrivateKeyCredentials} from "../../lib/src/EthersActionExecutor";
 import waitUntil from "async-wait-until";
 import {TransactionReceipt} from "@ethersproject/abstract-provider/src.ts/index";
 import {expect} from "chai";

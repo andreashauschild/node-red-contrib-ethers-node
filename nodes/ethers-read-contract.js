@@ -1,6 +1,6 @@
 const {
     EthersActionExecutor
-} = require("../dist/src/EthersActionExecutor");
+} = require("../dist/EthersActionExecutor");
 module.exports = function (RED) {
     function EthersReadContractNode(config) {
         RED.nodes.createNode(this, config);

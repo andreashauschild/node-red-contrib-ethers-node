@@ -1,6 +1,6 @@
 {
   "include": [
-    "lib/src","test"
+    "lib/src"
   ],
   "exclude": [
     "node_modules",

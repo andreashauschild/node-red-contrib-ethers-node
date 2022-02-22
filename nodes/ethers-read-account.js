@@ -2,7 +2,7 @@ const {
     ReadAccountAction,
     ActionType,
     EthersActionExecutor
-} = require("../dist/src/EthersActionExecutor");
+} = require("../dist/EthersActionExecutor");
 module.exports = function (RED) {
     function EthersAccountReadNode(config) {
         RED.nodes.createNode(this, config);
