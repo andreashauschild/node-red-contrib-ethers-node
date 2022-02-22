@@ -105,5 +105,129 @@
 </script>
 
 <script type="text/markdown" data-help-name="ethers-write-contract">
-    Executes write operation on smart contracts
+Executed write methods (methods that create a transaction) of a given contract.
+### Input
+
+| Property                                | Type            | Description                                                                                                                                                   |
+|-----------------------------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Name                                    | `string`        | Displayed name of the node                                                                                                                                    |
+| Credential                              | `configuration` | Credentials that should be used for the transfer                                                                                                              |
+| Contract                                | `configuration` | Contract configuration of contract that should be used                                                                                                        |
+| Contract Address                        | `address`       | Address of contract that should be called                                                                                                                     |
+| Method                                  | `string`        | Signature of method that should be executed. E.g. `mint( address, uint256)`                                                                                   |
+| Params                                  | `array`         | Array of parameters that matches the signature of called method. E.g mint: `["0x2d3279B2ee7ecB8b7822c81Be8e1b0d89F886Fd3",10]`                                |
+| Payment                                 | `string`        | If the method you call is payable, this input defines the amount of **ETH** (no WEI) that will be send with the call.  Leave it empty if you dont send ether. |
+| Hierarchical Deterministic Wallet Index | `number`        | Wallet index to us if your credential is from type Mnemonic                                                                                                   |
+
+
+### Output
+
+| Property          | Type                         | Description                            |
+|-------------------|------------------------------|----------------------------------------|
+| Output               | `ethers Transaction Receipt` | Transaction Receipt of the method call |
+
+#### Example Output: mint( address, uint256)
+
+```
+{
+   "to":"0x379F52d261B88f1914D31d7d191bfAAFb0c219CA",
+   "from":"0x7fBbb98Ff2f7f036f515C9F02c0d2eFb56A1bE33",
+   "contractAddress":null,
+   "transactionIndex":3,
+   "gasUsed":{
+      "type":"BigNumber",
+      "hex":"0x9aa2"
+   },
+   "logsBloom":"0x00000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000008000000800000000000000001000100000000004000000000020000000000000000000800000000000040000080000010000000000000000000000000000000000000000004000000000080000000000000000000200000000000000000000000000000000000000000000000008000000001004000000002000000000021000000000040000000000000000000100040000020080000000000000000000000000000000000000000000000000000000000100000",
+   "blockHash":"0xb4abcbe021e1f6b928245cdb998d8441e35de2c540a5983760c7599ef31cbee6",
+   "transactionHash":"0xc21180a2dc8b89689f34d487e09b381509e1a0bf6c28b906bdc4c65f5aff8ef3",
+   "logs":[
+      {
+         "transactionIndex":3,
+         "blockNumber":25201029,
+         "transactionHash":"0xc21180a2dc8b89689f34d487e09b381509e1a0bf6c28b906bdc4c65f5aff8ef3",
+         "address":"0x379F52d261B88f1914D31d7d191bfAAFb0c219CA",
+         "topics":[
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "0x0000000000000000000000002d3279b2ee7ecb8b7822c81be8e1b0d89f886fd3"
+         ],
+         "data":"0x000000000000000000000000000000000000000000000000000000000000000a",
+         "logIndex":6,
+         "blockHash":"0xb4abcbe021e1f6b928245cdb998d8441e35de2c540a5983760c7599ef31cbee6"
+      },
+      {
+         "transactionIndex":3,
+         "blockNumber":25201029,
+         "transactionHash":"0xc21180a2dc8b89689f34d487e09b381509e1a0bf6c28b906bdc4c65f5aff8ef3",
+         "address":"0x0000000000000000000000000000000000001010",
+         "topics":[
+            "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+            "0x0000000000000000000000000000000000000000000000000000000000001010",
+            "0x0000000000000000000000007fbbb98ff2f7f036f515c9f02c0d2efb56a1be33",
+            "0x000000000000000000000000be188d6641e8b680743a4815dfa0f6208038960f"
+         ],
+         "data":"0x00000000000000000000000000000000000000000000000000005a0215ab920000000000000000000000000000000000000000000000000096341d3852c39dd500000000000000000000000000000000000000000000077321700f9f1199ed2e0000000000000000000000000000000000000000000000009633c3363d180bd5000000000000000000000000000000000000000000000773217069a127457f2e",
+         "logIndex":7,
+         "blockHash":"0xb4abcbe021e1f6b928245cdb998d8441e35de2c540a5983760c7599ef31cbee6"
+      }
+   ],
+   "blockNumber":25201029,
+   "confirmations":1,
+   "cumulativeGasUsed":{
+      "type":"BigNumber",
+      "hex":"0x04f9f3"
+   },
+   "effectiveGasPrice":{
+      "type":"BigNumber",
+      "hex":"0x9502f909"
+   },
+   "status":1,
+   "type":2,
+   "byzantium":true,
+   "events":[
+      {
+         "transactionIndex":3,
+         "blockNumber":25201029,
+         "transactionHash":"0xc21180a2dc8b89689f34d487e09b381509e1a0bf6c28b906bdc4c65f5aff8ef3",
+         "address":"0x379F52d261B88f1914D31d7d191bfAAFb0c219CA",
+         "topics":[
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "0x0000000000000000000000002d3279b2ee7ecb8b7822c81be8e1b0d89f886fd3"
+         ],
+         "data":"0x000000000000000000000000000000000000000000000000000000000000000a",
+         "logIndex":6,
+         "blockHash":"0xb4abcbe021e1f6b928245cdb998d8441e35de2c540a5983760c7599ef31cbee6",
+         "args":[
+            "0x0000000000000000000000000000000000000000",
+            "0x2d3279B2ee7ecB8b7822c81Be8e1b0d89F886Fd3",
+            {
+               "type":"BigNumber",
+               "hex":"0x0a"
+            }
+         ],
+         "event":"Transfer",
+         "eventSignature":"Transfer(address,address,uint256)"
+      },
+      {
+         "transactionIndex":3,
+         "blockNumber":25201029,
+         "transactionHash":"0xc21180a2dc8b89689f34d487e09b381509e1a0bf6c28b906bdc4c65f5aff8ef3",
+         "address":"0x0000000000000000000000000000000000001010",
+         "topics":[
+            "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+            "0x0000000000000000000000000000000000000000000000000000000000001010",
+            "0x0000000000000000000000007fbbb98ff2f7f036f515c9f02c0d2efb56a1be33",
+            "0x000000000000000000000000be188d6641e8b680743a4815dfa0f6208038960f"
+         ],
+         "data":"0x00000000000000000000000000000000000000000000000000005a0215ab920000000000000000000000000000000000000000000000000096341d3852c39dd500000000000000000000000000000000000000000000077321700f9f1199ed2e0000000000000000000000000000000000000000000000009633c3363d180bd5000000000000000000000000000000000000000000000773217069a127457f2e",
+         "logIndex":7,
+         "blockHash":"0xb4abcbe021e1f6b928245cdb998d8441e35de2c540a5983760c7599ef31cbee6"
+      }
+   ]
+}
+```
+
+
 </script>

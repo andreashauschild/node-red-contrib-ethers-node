@@ -79,6 +79,31 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="ethers-read-contract">
-    <p>Node to read data from smart contract</p>
+<script type="text/markdown" data-help-name="ethers-read-contract">
+Calls a read method from the given smart contract
+### Input
+
+| Property         | Type            | Description                                                                                                   |
+|------------------|-----------------|---------------------------------------------------------------------------------------------------------------|
+| Name             | `string`        | Displayed name of the node                                                                                    |
+| RPC              | `configuration` | RPC that should be used for the read action                                                                   |
+| Contract         | `configuration` | Contract that should be read                                                                                  |
+| Contract Address | `address`       | Address of the contract that should be read                                                                   |
+| Method           | `string`        | Method signature of method that should be read. Example: `balanceOf(address)`                                 |
+| Params           | `array`         | Array of parameters that matches the method signature `balanceOf` takes 1 parameter: `["0x380Da11Dc2efDce882634D216726Dbaa38877f5c"]` |
+
+
+### Output
+
+| Property          | Type     | Description    |
+|-------------------|----------|----------------|
+| Output               | `object` | Result of read |
+
+#### Example Output: balanceOf(address)
+
+```
+{"type":"BigNumber","hex":"0x00"}
+```
+
+
 </script>

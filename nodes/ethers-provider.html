@@ -27,6 +27,21 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="ethers-provider">
-    <p>Provides external lib like 'ethers' to global context.</p>
+<script type="text/markdown" data-help-name="ethers-provider">
+This node is used to provide the ether library to the global context to make it available in function nodes. 
+### Property
+
+| Property             | Type            | Description                                                                                                                                                                                       |
+|----------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Name                 | `string`        | Displayed name of the node                                                                                                                                                                        |
+| Ethers Context Key                 | `string`        | Global context key that should be used to provide the ethers library                                                                                                                                                                      |
+
+### Example usage in function node
+
+```
+const ethers = global.get("ethers")
+const decimals = 8
+const internalAmount = ethers.utils.parseUnits(amount,decimals)
+```
+
 </script>

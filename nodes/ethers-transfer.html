@@ -78,6 +78,85 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="ethers-transfer">
-    <p>Node to transfer base tokens to a given address</p>
+<script type="text/markdown" data-help-name="ethers-transfer">
+Transfers currency to a given target account
+### Input
+
+| Property   | Type            | Description                                                 |
+|------------|-----------------|-------------------------------------------------------------|
+| Name       | `string`        | Displayed name of the node                                  |
+| Credential | `configuration` | Credentials that should be used for the transfer            |
+| To Address | `address`       | Target address of the account which should receive currency |
+| Amount     | `string`        | Amount of currency to send. Unit is **ETH** not WEI         |
+| Hierarchical Deterministic Wallet Index     | `number`        | Wallet index to us if your credential is from type Mnemonic |
+
+
+### Output
+
+| Property          | Type                         | Description                     |
+|-------------------|------------------------------|---------------------------------|
+| Output               | `ethers Transaction Receipt` | Transaction Receipt of transfer |
+
+#### Example Output: balanceOf(address)
+
+```
+{
+   "to":"0xB3474e5f6186bFf89604bbf44630b2b49A8272aB",
+   "from":"0x7fBbb98Ff2f7f036f515C9F02c0d2eFb56A1bE33",
+   "contractAddress":null,
+   "transactionIndex":2,
+   "gasUsed":{
+      "type":"BigNumber",
+      "hex":"0x5208"
+   },
+   "logsBloom":"0x00000000000000020000000000000000000000000000000000000000000000000000000000000000000000100000000000008000000000000000000000000000000000000000000000000000000000800000000000000001000100000000000000000000000400000000000000000000000000000000000080000000000000000000000000000000000001000000000000000000000000000000000000000000200000000000000020000000001000000001000000000000008000000000004000000000000000000021000000000000000000000000800000108000000000000000000000000000000000000000000000000000000000000000000000100000",
+   "blockHash":"0xaed4d6524a9aec7df9ffd2f4f56c0026e21238290243702abdcfdc9ff4501831",
+   "transactionHash":"0x2cc18cd11c504dd88b3854e344740c8581ad315358fa193aee30fda47958c1cd",
+   "logs":[
+      {
+         "transactionIndex":2,
+         "blockNumber":25200955,
+         "transactionHash":"0x2cc18cd11c504dd88b3854e344740c8581ad315358fa193aee30fda47958c1cd",
+         "address":"0x0000000000000000000000000000000000001010",
+         "topics":[
+            "0xe6497e3ee548a3372136af2fcb0696db31fc6cf20260707645068bd3fe97f3c4",
+            "0x0000000000000000000000000000000000000000000000000000000000001010",
+            "0x0000000000000000000000007fbbb98ff2f7f036f515c9f02c0d2efb56a1be33",
+            "0x000000000000000000000000b3474e5f6186bff89604bbf44630b2b49a8272ab"
+         ],
+         "data":"0x000000000000000000000000000000000000000000000000002386f26fc100000000000000000000000000000000000000000000000000009657a42ac2849dd5000000000000000000000000000000000000000000003adb2c37798f65c5034000000000000000000000000000000000000000000000000096341d3852c39dd5000000000000000000000000000000000000000000003adb2c5b0081d5860340",
+         "logIndex":3,
+         "blockHash":"0xaed4d6524a9aec7df9ffd2f4f56c0026e21238290243702abdcfdc9ff4501831"
+      },
+      {
+         "transactionIndex":2,
+         "blockNumber":25200955,
+         "transactionHash":"0x2cc18cd11c504dd88b3854e344740c8581ad315358fa193aee30fda47958c1cd",
+         "address":"0x0000000000000000000000000000000000001010",
+         "topics":[
+            "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+            "0x0000000000000000000000000000000000000000000000000000000000001010",
+            "0x0000000000000000000000007fbbb98ff2f7f036f515c9f02c0d2efb56a1be33",
+            "0x000000000000000000000000c26880a0af2ea0c7e8130e6ec47af756465452e8"
+         ],
+         "data":"0x00000000000000000000000000000000000000000000000000002fbf9bd9c8000000000000000000000000000000000000000000000000009657d3ea5e60f615000000000000000000000000000000000000000000000616702f3d3ceb27dee10000000000000000000000000000000000000000000000009657a42ac2872e15000000000000000000000000000000000000000000000616702f6cfc8701a6e1",
+         "logIndex":4,
+         "blockHash":"0xaed4d6524a9aec7df9ffd2f4f56c0026e21238290243702abdcfdc9ff4501831"
+      }
+   ],
+   "blockNumber":25200955,
+   "confirmations":2,
+   "cumulativeGasUsed":{
+      "type":"BigNumber",
+      "hex":"0x041f67"
+   },
+   "effectiveGasPrice":{
+      "type":"BigNumber",
+      "hex":"0x9502f908"
+   },
+   "status":1,
+   "type":2,
+   "byzantium":true
+}
+```
 </script>

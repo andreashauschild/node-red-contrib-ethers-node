@@ -67,5 +67,35 @@
 </script>
 
 <script type="text/markdown" data-help-name="ethers-read-account">
-    Node to read data from smart contract
+This node is used to read information of an account
+### Input
+
+| Property             | Type            | Description                                                                                                                                                                                       |
+|----------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Name                 | `string`        | Displayed name of the node                                                                                                                                                                        |
+| RPC                  | `configuration` | RPC that should be used for the read action                                                                                                                                                       |
+| Account              | `address`       | Address of the account that should be read                                                                                                                                                        |
+| Method               | `option`        | Reading method that should be used. `Balance` `Transaction Count`                                                                                                                                 |
+
+- `Transaction Count`: Returns the number of transactions address has ever sent, as of blockTag. This value is required to be the nonce for the next transaction from address sent to the network.
+- `Balance`: Balance of the account
+
+
+### Output
+
+| Property          | Type               | Description     |
+|-------------------|--------------------|-----------------|
+| Output            | `object` | Result of executed method |
+
+#### Example Output: Balance
+
+```
+{"type":"BigNumber","hex":"0x3ac6ae462d57cc5c0340"}
+```
+
+#### Example Output: Transaction Count
+```
+17
+```
+    
 </script>

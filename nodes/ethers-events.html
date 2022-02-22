@@ -122,6 +122,63 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="ethers-events">
-    <p>Node to read event data from smart contract</p>
+
+<script type="text/markdown" data-help-name="ethers-events">
+This node is used to scan events from the given smart contract
+### Input
+
+| Property             | Type            | Description                                                                                                                                                                                       |
+|----------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Name                 | `string`        | Displayed name of the node                                                                                                                                                                        |
+| RPC                  | `configuration` | RPC that should be used for the read action                                                                                                                                                       |
+| Contract             | `configuration` | Type of Contract that should be read                                                                                                                                                              |
+| Contract Address     | `string`        | Address of the contract that should be read                                                                                                                                                       |
+| Contract Creation Tx | `hash`          | Hash of deployment transaction of the contract that should be read. _If set_ the blocknumber of the transaction is used as startblock for event scanning                                          |
+| Block From           | `number`        | Start block number of event scanning                                                                                                                                                              |
+| Block To             | `number`        | End block number of event scanning. Scanning will stop there if the block is reached                                                                                                              |
+| Block Range          | `number`        | Number of blocks that should be read for every request. Most times the RPC provider limits the size of the block range. Just try it out                                                           |
+| Event                | `string`        | Event that should be filtered. If not set all events of smart contract are retrieved. You can set the name of an event (e.g.`Transfer`) or it signature (e.g.`Transfer(address,address,uint256)`) |
+
+
+**Info**: If you only set `Contract Creation Tx` and no `Block From` and `Block To` all event from contraction until current blocknumber will be read
+
+
+### Output
+
+| Property          | Type               | Description     |
+|-------------------|--------------------|-----------------|
+| Output               | `arryay of events` | Array of Events |
+
+#### Output Example
+
+
+```
+[   
+   {
+      "blockNumber":24903452,
+      "blockHash":"0xcf7eebabc6c875644a2fe93eca6cb1618e672d27fc4f1af010ab8bf6ab774e16",
+      "transactionIndex":1,
+      "removed":false,
+      "address":"0x379F52d261B88f1914D31d7d191bfAAFb0c219CA",
+      "data":"0x00000000000000000000000000000000000000000000000000038d7ea4c68000",
+      "topics":[
+         "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+         "0x0000000000000000000000007fbbb98ff2f7f036f515c9f02c0d2efb56a1be33",
+         "0x0000000000000000000000002d3279b2ee7ecb8b7822c81be8e1b0d89f886fd3"
+      ],
+      "transactionHash":"0xd10d45a9623e5fd5cb128ce9667442fea76b68fc4eb52a1c30f75506a38e930a",
+      "logIndex":81,
+      "event":"Transfer",
+      "eventSignature":"Transfer(address,address,uint256)",
+      "args":[
+         "0x7fBbb98Ff2f7f036f515C9F02c0d2eFb56A1bE33",
+         "0x2d3279B2ee7ecB8b7822c81Be8e1b0d89F886Fd3",
+         {
+            "type":"BigNumber",
+            "hex":"0x038d7ea4c68000"
+         }
+      ]
+   }
+]
+```
 </script>

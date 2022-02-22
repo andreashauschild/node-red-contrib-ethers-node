@@ -74,6 +74,22 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="ethers-deploy">
-    <p>Node to deploy smart contract</p>
+<script type="text/markdown" data-help-name="ethers-deploy">
+This node is used to deploy a smart contract
+
+### Input
+
+| Property          | Type            | Description                                                                                                                                          |
+|-------------------|-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Name              | `string`        | Displayed name of the node                                                                                                                           |
+| Credential        | `configuration` | Credentials that should be used for smart contract deployment. _Be aware that you need currency if want to deploy_                                   |
+| Contract          | `configuration` | Contract that should be deployed                                                                                                                     |
+| Contructor Params | `array`         | Array of parameters that matches the constructor of the smart contract. E.g if you have an ERC20 Contract with 2 parameters: `["Token Name","SYMBOL"]` |
+| Hierarchical Deterministic Wallet Index               | `number`        | If your credential is based on a mnemonic you need to that the index of the account that should be used for the deployment                           |
+
+### Output
+
+| Property          | Type            | Description                                                                                                                                          |
+|-------------------|-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Output               | `ethers TransactionReceipt`        | TransactionReceipt of the deployment                           |
 </script>
