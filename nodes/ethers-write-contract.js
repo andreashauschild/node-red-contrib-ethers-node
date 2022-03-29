@@ -44,7 +44,6 @@ module.exports = function (RED) {
             const method = config.method
             const hierarchicalDeterministicWalletIndex = RED.util.evaluateNodeProperty(config.hierarchicalDeterministicWalletIndex, config.hierarchicalDeterministicWalletIndexType || "num", node, msg)
 
-
             if (cred.type === CredentialType.MNEMONIC) {
                 const action = EthersActionExecutor.writeContractAction(abi, bytecode,contractAddress,method, payment,params, hierarchicalDeterministicWalletIndex);
                 ethersActionExecutor.execute(action,msg);

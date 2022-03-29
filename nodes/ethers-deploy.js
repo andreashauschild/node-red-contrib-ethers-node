@@ -38,7 +38,7 @@ module.exports = function (RED) {
             if (cred.type === CredentialType.MNEMONIC) {
                 const action = EthersActionExecutor.deployContractAction(abi, bytecode, params, hierarchicalDeterministicWalletIndex);
                 action.callback = (result) => console.log(result)
-                ethersActionExecutor.execute(action);
+                ethersActionExecutor.execute(action,msg);
             } else if (cred.type === CredentialType.PRIVATE_KEY) {
                 ethersActionExecutor.execute(EthersActionExecutor.deployContractAction(abi, bytecode, params), msg);
             }
