@@ -3,7 +3,7 @@ const {
     createMnemonicCredential,
     createPrivateKeyCredential,
     CredentialType
-} = require("../dist/EthersActionExecutor");
+} = require("./lib/EthersActionExecutor");
 module.exports = function (RED) {
     function EthersWriteContractNode(config) {
         RED.nodes.createNode(this, config);

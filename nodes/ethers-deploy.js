@@ -3,7 +3,7 @@ const {
     createMnemonicCredential,
     createPrivateKeyCredential,
     CredentialType
-} = require("../dist/EthersActionExecutor");
+} = require("./lib/EthersActionExecutor");
 module.exports = function (RED) {
     function EthersDeployNode(config) {
         RED.nodes.createNode(this, config);
@@ -40,7 +40,7 @@ module.exports = function (RED) {
                 action.callback = (result) => console.log(result)
                 ethersActionExecutor.execute(action);
             } else if (cred.type === CredentialType.PRIVATE_KEY) {
-                ethersActionExecutor.execute(EthersActionExecutor.deployContractAction(abi, bytecode, params),msg);
+                ethersActionExecutor.execute(EthersActionExecutor.deployContractAction(abi, bytecode, params), msg);
             }
         });
     }

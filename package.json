@@ -12,6 +12,7 @@
   ],
   "watch": {
     "watch.dev": {
+      "ignore": "nodes/lib",
       "patterns": [
         "nodes",
         "src"
