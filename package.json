@@ -22,7 +22,7 @@
     }
   },
   "scripts": {
-    "watch.dev": "tsc && kill-port 1880 && node-red",
+    "watch.dev": "npx tsc && kill-port 1880 && node-red",
     "watch": "npm-watch",
     "build": "tsc"
   },
@@ -56,7 +56,8 @@
   },
   "dependencies": {
     "ethers": "^5.5.3",
-    "rxjs": "^7.5.2"
+    "rxjs": "^7.5.2",
+    "typescript": "^4.7.2"
   },
   "devDependencies": {
     "eslint": "^8.7.0",

@@ -54,7 +54,7 @@ To start developing run: `npm run watch`. This will:
 2. Kills the local node-red server on port `1880` (if you are not running node-red on `1880` you need to change the port in the package.json)
   ```
     "scripts": {
-      "watch.dev": "tsc && kill-port 1880 && node-red",
+      "watch.dev": "npx tsc && kill-port 1880 && node-red",
       "watch": "npm-watch"
     },
   ```
