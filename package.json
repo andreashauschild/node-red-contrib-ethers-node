@@ -1,6 +1,6 @@
 {
   "name": "@andreashauschild/node-red-contrib-ethers-node",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "description": "Node-Red  noded for wrapping ethers functions.",
   "main": "index.js",
   "keywords": [
