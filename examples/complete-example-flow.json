@@ -458,7 +458,8 @@
         "p": "payload"
       },
       {
-        "p": "topic",
+        "p": "address",
+        "v": "0xB3474e5f6186bFf89604bbf44630b2b49A8272aB",
         "vt": "str"
       }
     ],
@@ -474,7 +475,8 @@
     "wires": [
       [
         "51e0a828da2d5c78",
-        "403ac25bc7240606"
+        "403ac25bc7240606",
+        "f3680f1598ccb1e1"
       ]
     ]
   },
@@ -1016,6 +1018,25 @@
     "x": 190,
     "y": 1740,
     "wires": []
+  },
+  {
+    "id": "f3680f1598ccb1e1",
+    "type": "ethers-read-account",
+    "z": "94c6411661d51f3e",
+    "name": "Balance by msg object",
+    "rpc": "3bab0e9b304a2ca1",
+    "method": "balance",
+    "accountAddress": "address",
+    "accountAddressType": "msg",
+    "output": "payload",
+    "outputType": "msg",
+    "x": 340,
+    "y": 1300,
+    "wires": [
+      [
+        "ace9eca43f1ea58e"
+      ]
+    ]
   },
   {
     "id": "946cb3ebddd54b58",
