@@ -60,7 +60,6 @@ class EthersActionExecutor {
     }
     async executeRead(a, msg) {
         this.node.status({});
-        this.setMsg(msg);
         if (a.type === ActionType.READ_CONTRACT) {
             try {
                 const action = a;
@@ -70,10 +69,10 @@ class EthersActionExecutor {
                 method = method.replace(/\s/g, '');
                 const result = await contract[method](...action.params);
                 this.node.status({ fill: "green", shape: "ring", text: `success` });
-                this.setOutput(result);
+                this.setOutput(result, msg);
             }
             catch (error) {
-                this.node.error(error, this.msg);
+                this.node.error(error, msg);
                 this.node.status({ fill: "red", shape: "ring", text: `failed` });
             }
         }
@@ -88,17 +87,17 @@ class EthersActionExecutor {
                         shape: "ring",
                         text: `Balance: ${ethers.utils.formatEther(result.toString())}`
                     });
-                    this.setOutput(result);
+                    this.setOutput(result, msg);
                 }
                 else if (action.method === 'transactionCount') {
                     this.node.status({ fill: "yellow", shape: "ring", text: "reading" });
                     const result = await this.provider.getTransactionCount(action.accountAddress);
                     this.node.status({ fill: "green", shape: "ring", text: `Tx Count: ${result}` });
-                    this.setOutput(result);
+                    this.setOutput(result, msg);
                 }
             }
             catch (error) {
-                this.node.error(error, this.msg);
+                this.node.error(error, msg);
                 this.node.status({ fill: "red", shape: "ring", text: `failed` });
             }
         }
@@ -150,21 +149,20 @@ class EthersActionExecutor {
                     this.node.status({ fill: "yellow", shape: "ring", text: status });
                     console.log(status);
                     if (events.length > 0) {
-                        this.setOutput(events);
+                        this.setOutput(events, msg);
                     }
                     next += range;
                 }
                 this.node.status({ fill: "green", shape: "ring", text: status });
             }
             catch (error) {
-                this.node.error(error, this.msg);
+                this.node.error(error, msg);
                 this.node.status({ fill: "red", shape: "ring", text: `failed` });
             }
         }
     }
     execute(action, msg) {
         this.node.status({});
-        this.setMsg(msg);
         if (this.credentials.type === CredentialType.MNEMONIC && action.hierarchicalDeterministicWalletIndex == null) {
             this.node.error(`Node use credentials of type '${CredentialType.MNEMONIC}', but the action does not provide a 'hierarchicalDeterministicWalletIndex'. Action will not be executed!`);
             return;
@@ -178,9 +176,9 @@ class EthersActionExecutor {
                             const wallet = ethers.Wallet.fromMnemonic(this.credentials.mnemonic, path).connect(this.provider);
                             this.wallets[action.hierarchicalDeterministicWalletIndex] = wallet;
                             this.subjects[action.hierarchicalDeterministicWalletIndex] = new rxjs_1.Subject();
-                            this.subscribeTransferHandler(this.subjects[action.hierarchicalDeterministicWalletIndex]);
-                            this.subscribeDeployContractHandler(this.subjects[action.hierarchicalDeterministicWalletIndex]);
-                            this.subscribeWriteContractHandler(this.subjects[action.hierarchicalDeterministicWalletIndex]);
+                            this.subscribeTransferHandler(this.subjects[action.hierarchicalDeterministicWalletIndex], msg);
+                            this.subscribeDeployContractHandler(this.subjects[action.hierarchicalDeterministicWalletIndex], msg);
+                            this.subscribeWriteContractHandler(this.subjects[action.hierarchicalDeterministicWalletIndex], msg);
                         }
                         this.subjects[action.hierarchicalDeterministicWalletIndex].next(action);
                     }
@@ -194,15 +192,15 @@ class EthersActionExecutor {
                     const wallet = new ethers.Wallet(this.credentials.privateKey).connect(this.provider);
                     this.wallets[0] = wallet;
                     this.subjects[0] = new rxjs_1.Subject();
-                    this.subscribeTransferHandler(this.subjects[0]);
-                    this.subscribeDeployContractHandler(this.subjects[0]);
-                    this.subscribeWriteContractHandler(this.subjects[0]);
+                    this.subscribeTransferHandler(this.subjects[0], msg);
+                    this.subscribeDeployContractHandler(this.subjects[0], msg);
+                    this.subscribeWriteContractHandler(this.subjects[0], msg);
                 }
                 this.subjects[0].next(action);
             }
         }
     }
-    subscribeDeployContractHandler(subject) {
+    subscribeDeployContractHandler(subject, msg) {
         subject.pipe((0, rxjs_1.filter)(a => a != null && a.type === ActionType.DEPLOY_CONTRACT), (0, rxjs_1.concatMap)(async (a) => {
             try {
                 let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
@@ -217,22 +215,22 @@ class EthersActionExecutor {
                     this.node.status({ fill: "green", shape: "ring", text: `deployed ${contract.address}` });
                     return { txReceipt, action, contract };
                 }).catch(e => {
-                    this.node.error(e, this.msg);
+                    this.node.error(e, msg);
                     this.node.status({ fill: "red", shape: "ring", text: `failed` });
                 });
             }
             catch (e) {
-                this.node.error(e, this.msg);
+                this.node.error(e, msg);
                 this.node.status({ fill: "red", shape: "ring", text: `failed` });
                 return undefined;
             }
         })).subscribe(result => {
             var _a;
             this.node.log(`Deployed contract to '${(_a = result === null || result === void 0 ? void 0 : result.contract) === null || _a === void 0 ? void 0 : _a.address}'`);
-            this.setOutput(result === null || result === void 0 ? void 0 : result.txReceipt);
+            this.setOutput(result === null || result === void 0 ? void 0 : result.txReceipt, msg);
         });
     }
-    subscribeWriteContractHandler(subject) {
+    subscribeWriteContractHandler(subject, msg) {
         subject.pipe((0, rxjs_1.filter)(a => a != null && a.type === ActionType.WRITE_CONTRACT), (0, rxjs_1.concatMap)(async (a) => {
             try {
                 let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
@@ -254,12 +252,12 @@ class EthersActionExecutor {
                     this.node.status({ fill: "green", shape: "ring", text: `success` });
                     return { txReceipt, action, contract };
                 }).catch(e => {
-                    this.node.error(e, this.msg);
+                    this.node.error(e, msg);
                     this.node.status({ fill: "red", shape: "ring", text: `failed` });
                 });
             }
             catch (e) {
-                this.node.error(e, this.msg);
+                this.node.error(e, msg);
                 this.node.status({ fill: "red", shape: "ring", text: `failed` });
                 return undefined;
             }
@@ -267,11 +265,11 @@ class EthersActionExecutor {
             var _a;
             if (result) {
                 this.node.log(`executed method '${result === null || result === void 0 ? void 0 : result.action.method}' with params '${result === null || result === void 0 ? void 0 : result.action.params}' on contract '${result === null || result === void 0 ? void 0 : result.contract.address} with tx: ${(_a = result === null || result === void 0 ? void 0 : result.txReceipt) === null || _a === void 0 ? void 0 : _a.transactionHash}'`);
-                this.setOutput(result === null || result === void 0 ? void 0 : result.txReceipt);
+                this.setOutput(result === null || result === void 0 ? void 0 : result.txReceipt, msg);
             }
         });
     }
-    subscribeTransferHandler(subject) {
+    subscribeTransferHandler(subject, msg) {
         subject.pipe((0, rxjs_1.filter)(a => a != null && a.type === ActionType.TRANSFER), (0, rxjs_1.concatMap)(async (a) => {
             try {
                 let walletIndex = !a.hierarchicalDeterministicWalletIndex ? 0 : a.hierarchicalDeterministicWalletIndex;
@@ -288,12 +286,12 @@ class EthersActionExecutor {
                 return this.provider.waitForTransaction(tx.hash).then(txReceipt => {
                     return { txReceipt, action };
                 }).catch(e => {
-                    this.node.error(e, this.msg);
+                    this.node.error(e, msg);
                     this.node.status({ fill: "red", shape: "ring", text: `failed` });
                 });
             }
             catch (e) {
-                this.node.error(e, this.msg);
+                this.node.error(e, msg);
                 this.node.status({ fill: "red", shape: "ring", text: `failed` });
                 return undefined;
             }
@@ -303,36 +301,30 @@ class EthersActionExecutor {
                 const log = `Transferred '${(_a = result === null || result === void 0 ? void 0 : result.action) === null || _a === void 0 ? void 0 : _a.amount}' from: '${(_b = result === null || result === void 0 ? void 0 : result.txReceipt) === null || _b === void 0 ? void 0 : _b.from}' to '${(_c = result === null || result === void 0 ? void 0 : result.txReceipt) === null || _c === void 0 ? void 0 : _c.to}'`;
                 this.node.log(log);
                 this.node.status({ fill: "green", shape: "ring", text: log });
-                this.setOutput(result === null || result === void 0 ? void 0 : result.txReceipt);
+                this.setOutput(result === null || result === void 0 ? void 0 : result.txReceipt, msg);
             }
         });
     }
-    setOutput(result) {
+    setOutput(result, msg) {
         var _a;
         if (this.output) {
             switch (this.output.context) {
                 case "msg": {
-                    this.msg[(_a = this.output) === null || _a === void 0 ? void 0 : _a.key] = result;
-                    this.node.send(this.msg);
+                    msg[(_a = this.output) === null || _a === void 0 ? void 0 : _a.key] = result;
+                    this.node.send(msg);
                     break;
                 }
                 case "flow": {
                     this.node.context().flow.set(this.output.key, result);
-                    this.node.send(this.msg);
+                    this.node.send(msg);
                     break;
                 }
                 case "global": {
                     this.node.context().global.set(this.output.key, result);
-                    this.node.send(this.msg);
+                    this.node.send(msg);
                     break;
                 }
             }
-        }
-    }
-    setMsg(msg) {
-        this.msg = msg;
-        if (!this.msg) {
-            throw Error("can not execute Read. Message need to be provided");
         }
     }
     fn(num) {

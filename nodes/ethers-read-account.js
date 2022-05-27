@@ -14,15 +14,16 @@ module.exports = function (RED) {
             context: this.outputType,
             key: this.output
         });
-        node.on('input', function (msg) {
+        node.on('input', async function (msg) {
             const accountAddress = RED.util.evaluateNodeProperty(config.accountAddress, config.accountAddressType || "str", node, msg)
             const method = config.method
             const action = {
-                type:ActionType.READ_ACCOUNT,
+                type: ActionType.READ_ACCOUNT,
                 accountAddress,
                 method
             }
-            ethersActionExecutor.executeRead(action,msg);
+
+            await ethersActionExecutor.executeRead(action, msg);
         });
     }
 
